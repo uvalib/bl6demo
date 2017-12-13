@@ -69,3 +69,9 @@ gem 'jquery-rails'
 gem 'devise'
 gem 'devise-guests', '~> 0.6'
 gem 'blacklight-marc', '~> 6.1'
+
+# RWL 2017-12-11 Added per https://github.com/projectblacklight/blacklight_advanced_search
+gem 'blacklight_advanced_search'
+
+# RWL 2017-12-11 Added per https://github.com/projectblacklight/blacklight/blob/release-4.7/doc/Blacklight-4.0-release-notes-and-upgrade-guide.md
+gem 'unicode'

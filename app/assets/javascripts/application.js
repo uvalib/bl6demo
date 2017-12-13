@@ -15,6 +15,9 @@
 //
 // Required by Blacklight
 //= require jquery
+//= require 'blacklight_advanced_search'
+
+
 //= require blacklight/blacklight
 
 //= require_tree .

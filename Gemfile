@@ -52,3 +52,20 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+# RWL 2017-12-08 Added per https://github.com/projectblacklight/blacklight/wiki/Quickstart
+gem 'blacklight', '>= 6.1'
+
+# RWL 2017-12-08 Following lines added by
+# `rails generate blacklight:install --devise --marc --solr_version=latest`
+
+
+group :development, :test do
+  gem 'solr_wrapper', '>= 0.3'
+end
+
+gem 'rsolr', '>= 1.0'
+gem 'jquery-rails'
+gem 'devise'
+gem 'devise-guests', '~> 0.6'
+gem 'blacklight-marc', '~> 6.1'

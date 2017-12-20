@@ -1,3 +1,6 @@
+# RWL - This should actually be in Blacklight-MARC marc/indexer.rb
+require 'traject'
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 

@@ -51,4 +51,13 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # RWL - Allow Web Console on all internal networks.
+  # RWL - TODO: method for getting good IPAddrs out of TRUSTED_PROXIES.
+  config.web_console.whitelisted_ips +=
+    ActionDispatch::RemoteIp::TRUSTED_PROXIES.map { |addr|
+      klass = addr.class.to_s
+      addr_and_mask = addr.inspect.sub(/^.<#{klass}: [^:]+:(.*)>$/, '\1')
+      IPAddr.new(addr_and_mask)
+    }
 end

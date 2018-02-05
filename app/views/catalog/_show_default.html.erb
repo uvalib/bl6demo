@@ -1,0 +1,24 @@
+<%# app/views/catalog/_show_default.html.erb -%>
+<%-
+  # Default partial to display Backlight::Document fields in item details view.
+  # TODO: this may not be necessary to override...
+
+  doc = document ||= @document
+  field_names =
+    document_show_fields(doc).select { |_, field_def|
+      should_render_show_field?(doc, field_def)
+    }.keys
+  doc_presenter = show_presenter(doc)
+
+-%>
+<dl class="dl-horizontal dl-invert">
+  <%- field_names.each do |name| -%>
+    <%- css_class = 'blacklight-' + name.parameterize -%>
+    <dt class="<%= css_class %>">
+      <%= render_document_show_field_label(doc, field: name) %>
+    </dt>
+    <dd class="<%= css_class %>">
+      <%= doc_presenter.field_value(name) %>
+    </dd>
+  <%- end -%>
+</dl>

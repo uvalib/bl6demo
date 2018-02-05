@@ -1,0 +1,21 @@
+// app/assets/stylesheets/shared/_show.scss
+
+//=============================================================================
+// Common definitions for item detail (show) pages
+//=============================================================================
+
+body.blacklight-catalog-show {
+    .document-thumbnail {
+
+        float:         right;
+        width:         180px;
+        margin-left:   3em;
+        margin-bottom: 2em;
+
+        img {
+            float:      right;
+            max-width:  100%;
+            max-height: 100%;
+        }
+    }
+}

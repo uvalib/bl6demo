@@ -1,0 +1,46 @@
+// app/assets/stylesheets/shared/_index.scss
+
+//=============================================================================
+// Common definitions for search result (index) pages.
+//=============================================================================
+
+#sortAndPerPage {
+    .tools.btn-group {
+        .rss-link,
+        .atom-link,
+        .print-view-link {
+            margin-left: 0.5em;
+            > * {
+                font-size:   150%;
+                line-height: 150%;
+            }
+        }
+    }
+}
+
+// Document list
+#documents .document {
+
+    .document-title-heading {
+
+        display:   flex;
+        font-size: larger;
+
+        .document-counter {
+            display:        inline-block;
+            margin-right:   0.25em;
+            vertical-align: top;
+        }
+
+        a {
+            display: inline-block;
+        }
+    }
+
+    .document-thumbnail {
+        img {
+            max-height: 120px;
+            max-width:  240px;
+        }
+    }
+}

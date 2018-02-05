@@ -1,0 +1,30 @@
+<%# app/views/bookmarks/index.html.erb -%>
+<%-
+  # NOTE: Added to render each type of document separately according to its presenter
+
+  @page_title =
+    t('blacklight.bookmarks.page_title', application_name: application_name)
+
+  page_heading = t('blacklight.bookmarks.title')
+
+  section_heading =
+    if current_or_guest_user.blank?
+      t('blacklight.bookmarks.need_login')
+    elsif @document_list.blank?
+      t('blacklight.bookmarks.no_bookmarks')
+    end
+
+  template_opts = { document_list: @document_list, }
+-%>
+<div id="content" class="col-md-12">
+  <h2 class='page-heading'><%= page_heading %></h2>
+  <%- if section_heading -%>
+    <h3 class='section-heading'><%= section_heading %></h3>
+  <%- else -%>
+    <%= render 'sort_and_per_page' %>
+    <%= render 'tools', template_opts %>
+    <%= render 'document_list', template_opts %>
+    <%= render 'results_pagination' %>
+  <%- end -%>
+</div>
+

@@ -1,0 +1,20 @@
+<%# app/views/catalog/_facet_limit.html.erb -%>
+<%-
+  paginator = facet_paginator(facet_field, display_facet)
+  more_facets =
+    unless paginator.last_page? || (params[:action] == 'facet')
+      label = t(
+        "more_#{field_name}_html",
+        scope:      'blacklight.search.facets',
+        field_name: facet_field.label,
+        default:    :more_html
+      )
+      path  = search_facet_path(id: facet_field.key)
+      link_to(label, path, class: 'more_facets_link')
+    end
+  more_facets &&= content_tag(:li, more_facets, class: 'more_facets_link')
+-%>
+<ul class="facet-values list-unstyled">
+  <%= render_facet_limit_list(paginator, facet_field.key) %>
+  <%= more_facets -%>
+</ul>

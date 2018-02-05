@@ -1,0 +1,9 @@
+<%# app/views/root/_home.html.erb -%>
+<%-
+  # Application "main page" content.
+  heading = t('blacklight.all.welcome')
+-%>
+<%= render 'shared/home_heading', heading: heading %>
+<%# render 'root/announcements' %>
+<%# render 'root/featured' %>
+<%= render 'root/home_text' %>

@@ -1,0 +1,58 @@
+<%# app/views/root/_home_text.html.erb -%>
+<%-
+  # Content for the application main page.
+  # For the time being, this is encorporated by catalog/_home.html.erb.
+-%>
+<div>
+  <h3 class='section-heading'>Welcome</h3>
+  <p>
+    This is a demonstration of Blacklight 6 with modifications to support
+    index retrieval from both Solr for catalog search and EBSCO EDS for
+    articles search.  Routes include:
+  </p>
+  <table style="width: 100%">
+    <thead>
+      <th style="width: 25%">Link</th>
+      <th>Description</th>
+    </thead>
+    <tr>
+      <th><a href="catalog">/catalog</a></th>
+      <td>Catalog search "home" page.</td>
+    </tr>
+    <tr>
+      <th><a href="catalog/advanced">/catalog/advanced</a></th>
+      <td>Catalog advanced search form.</td>
+    </tr>
+    <tr>
+      <th><a href="articles">/articles</a></th>
+      <td>Articles search "home" page.</td>
+    </tr>
+    <tr>
+      <th><a href="articles/advanced">/articles/advanced</a></th>
+      <td>Articles advanced search form.</td>
+    </tr>
+  </table>
+</div>
+<%# This is the same panel shown in the Rails welcome template -%>
+<div id="about">
+  <h3 class='section-heading'>
+    <a id="about-env" href="/rails/info/properties">
+      About your application&rsquo;s environment
+    </a>
+  </h3>
+  <div id="about-env-content" class="well" style="display: none"></div>
+</div>
+<script>
+  $(function() {
+    $('#about-env').click(function(e) {
+      e.preventDefault();
+      var $content = $('#about-env-content');
+      if ($content.html() === '') {
+        var url = $(this).attr('href');
+        $content.load(url, function() { $content.show(); });
+      } else {
+        $content.toggle();
+      }
+    });
+  });
+</script>

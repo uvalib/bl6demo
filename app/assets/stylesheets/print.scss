@@ -1,0 +1,20 @@
+// app/assets/stylesheets/print.css.scss
+
+@import 'manifest';
+
+//=============================================================================
+// Adjustments for print view. NOTE: Just testing...
+//=============================================================================
+
+// TODO: just testing -- delete
+* {
+    color:      black !important;
+    background: white !important;
+}
+
+// Make Find@UVa logo and other images grayscale to better support non-color
+// printers.
+img {
+    display: block;
+    filter:  grayscale(100%) !important;
+}

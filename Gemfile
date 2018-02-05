@@ -75,3 +75,6 @@ gem 'blacklight_advanced_search'
 
 # RWL 2017-12-11 Added per https://github.com/projectblacklight/blacklight/blob/release-4.7/doc/Blacklight-4.0-release-notes-and-upgrade-guide.md
 gem 'unicode'
+
+# RWL 2017-12-20 Added per https://github.com/ebsco/edsapi-ruby/wiki/Quick-Start
+gem 'ebsco-eds'

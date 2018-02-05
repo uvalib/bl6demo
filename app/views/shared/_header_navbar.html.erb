@@ -1,0 +1,36 @@
+<%# app/views/shared/_header_navbar.html.erb -%>
+<%-
+  logo = link_to(h(application_name), root_path)
+  lens = (lens_key unless request.path == root_path)
+  lens =
+    if Blacklight::Lens.valid_key?(lens)
+      label = h(lens.to_s.capitalize)
+      path  = send("search_#{lens}_path")
+      link  = link_to(label, path, class: 'navbar-lens')
+      " &ndash; #{link}".html_safe
+    end
+-%>
+
+<div id="header-navbar" class="navbar navbar-inverse navbar-static-top" role="navigation">
+  <div class="<%= container_classes %>">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle btn collapsed" data-toggle="collapse" data-target="#user-util-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <span class="navbar-brand"><%= logo -%><%= lens -%></span>
+    </div>
+
+    <div class="collapse navbar-collapse" id="user-util-collapse">
+      <%= render '/user_util_links' %>
+    </div>
+  </div>
+</div>
+
+<div id="search-navbar" class="navbar navbar-default navbar-static-top" role="navigation">
+  <div class="<%= container_classes %>">
+    <%= render_search_bar %>
+  </div>
+</div>

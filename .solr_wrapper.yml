@@ -3,7 +3,5 @@
 collection:
   dir: solr/conf/
   name: blacklight-core
-  # RWL 2017-12-12
   persist: true
-# RWL 2017-12-12
 verbose: true

@@ -1,0 +1,21 @@
+<%# app/views/articles/_featured.html.erb -%>
+<%-
+  # Articles lens "featured" items.
+  featured_items ||= nil
+  featured_items = [ # TODO: testing; remove
+    'one...',
+    'two...',
+    'three...'
+  ]
+  return unless featured_items.present?
+  id      ||= 'featured'
+  heading ||= 'Featured articles' # TODO: I18n
+  item_list =
+    featured_items.map { |item|
+      content_tag(:li, h(item)) if item.present?
+    }.compact.join("\n").html_safe
+-%>
+<div id="<%= id %>">
+  <h3 class='section-heading'><%= heading %></h3>
+  <ul><%= item_list %></ul>
+</div>

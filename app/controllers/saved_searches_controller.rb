@@ -1,6 +1,18 @@
+# app/controllers/saved_searches_controller.rb
+#
 # frozen_string_literal: true
-class SavedSearchesController < ApplicationController
-  include Blacklight::SavedSearches
+# warn_indent:           true
 
-  helper BlacklightAdvancedSearch::RenderConstraintsOverride
+__loading_begin(__FILE__)
+
+require 'blacklight/lens'
+
+# Replaces the Blacklight class of the same name.
+#
+class SavedSearchesController < ApplicationController
+  include Blacklight::SavedSearchesExt
+  include BlacklightAdvancedSearch::ControllerExt
+  include LensConcern
 end
+
+__loading_end(__FILE__)

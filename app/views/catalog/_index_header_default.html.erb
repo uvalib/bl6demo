@@ -1,0 +1,33 @@
+<%# app/views/catalog/_index_header_default.html.erb -%>
+<%-
+  # Main values for an item entry on the index in a search results page.
+
+  doc = document ||= @document
+  document_counter ||= -1
+
+  # Bookmark functions for items/docs.
+  document_actions =
+    render_index_doc_actions(
+      doc,
+      wrapping_class: 'index-document-functions col-sm-3 col-lg-2'
+    )
+
+  # Main title container for do partial view.
+  # How many bootstrap columns need to be reserved for bookmarks control
+  # depends on size.
+  width   = document_actions.present? ? 'col-sm-9 col-lg-10' : 'col-md-12'
+  counter = document_counter_with_offset(document_counter)
+  link_field = document_show_link_field(doc) # Field with the text of label.
+  link_opt   = { counter: counter } #, show_subtitle: true }
+-%>
+<div class="documentHeader row">
+  <h3 class="index_title document-title-heading <%= width %>">
+    <%- if counter -%>
+      <span class="document-counter">
+        <%= t('blacklight.search.documents.counter', counter: counter) %>
+      </span>
+    <%- end -%>
+    <%= link_to_document(doc, link_field, link_opt) %>
+  </h3>
+  <%= document_actions %>
+</div>

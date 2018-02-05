@@ -1,0 +1,8 @@
+<%# app/views/articles/_home.html.erb -%>
+<%-
+  # Articles lens "main page" content.
+  heading = t('blacklight.articles.welcome')
+-%>
+<%= render 'shared/home_heading', heading: heading %>
+<%= render 'announcements' %>
+<%= render 'featured' %>

@@ -1,0 +1,43 @@
+<%# app/views/catalog/_show_main_content.html.erb -%>
+<%-
+  doc ||= @document
+  return unless doc
+
+  @page_title = t(
+    'blacklight.search.show.title',
+    document_title:   document_title(doc),
+    application_name: application_name
+  ).html_safe
+
+  content_for(:head) { render_link_rel_alternates(doc) }
+
+  css_class ||= 'document'
+  css = Array.wrap(css_class)
+  css << render_document_class(doc)
+  css = css.compact.join(' ')
+
+  dataset          ||= nil
+  microdata        ||= %Q(itemtype="#{doc.itemtype}")
+  document_counter ||= -1
+
+  # Page-unique identifier for the element associated with this document.
+  document_id = 'doc_' + doc.id.to_s.parameterize
+
+  # COinS, for Zotero among others.
+  # This document_partial_name(@document) business is not quite right,
+  # but has been there for a while.
+  coins = doc.export_as_openurl_ctx_kev(document_partial_name(doc))
+  coins &&= content_tag(:span, '', class: 'Z3988', title: h(coins))
+
+  partials = blacklight_config.view_config(:show).partials
+  locals   = { document_counter: document_counter }
+-%>
+
+<%= render 'previous_next_doc' %>
+
+<div id="document" class="<%= css_class -%>" <%= dataset %> itemscope <%= microdata %>>
+  <div id="<%= document_id %>">
+    <%= coins %>
+    <%= render_document_partials(doc, partials, locals) %>
+  </div>
+</div>

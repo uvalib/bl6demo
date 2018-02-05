@@ -1,5 +1,11 @@
+# config/environments/development.rb
+#
+# frozen_string_literal: true
+# warn_indent:           true
+
 Rails.application.configure do
-  # Settings specified here will take precedence over those in config/application.rb.
+
+  # Settings specified here take precedence over those in config/application.rb
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
@@ -18,7 +24,7 @@ Rails.application.configure do
 
     config.cache_store = :memory_store
     config.public_file_server.headers = {
-      'Cache-Control' => "public, max-age=#{2.days.seconds.to_i}"
+      'Cache-Control' => "public, max-age=#{2.days.to_i}"
     }
   else
     config.action_controller.perform_caching = false
@@ -48,12 +54,12 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  # Use an evented file watcher to asynchronously detect changes in source code,
-  # routes, locales, etc. This feature depends on the listen gem.
+  # Use an evented file watcher to asynchronously detect changes in source
+  # code, routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  # RWL - Allow Web Console on all internal networks.
-  # RWL - TODO: method for getting good IPAddrs out of TRUSTED_PROXIES.
+  # Allow Web Console on all internal networks.
+  # TODO: method for getting good IPAddrs out of TRUSTED_PROXIES.
   config.web_console.whitelisted_ips +=
     ActionDispatch::RemoteIp::TRUSTED_PROXIES.map { |addr|
       klass = addr.class.to_s

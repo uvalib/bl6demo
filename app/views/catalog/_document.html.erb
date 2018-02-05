@@ -1,0 +1,25 @@
+<%# app/views/catalog/_document.html.erb -%>
+<%-
+  # Container for a single document.
+  # NOTE: Doesn't add anything (other than legibility); could be deleted...
+
+  doc = document ||= @document
+  return unless doc
+  document_counter ||= -1
+
+  css_class ||= 'document'
+  css = Array.wrap(css_class)
+  css << render_document_class(doc)
+  css << "document-position-#{document_counter}"
+  css = css.compact.join(' ')
+
+  dataset   ||= %Q(data-document-counter="#{document_counter}")
+  microdata ||= %Q(itemtype="#{doc.itemtype}")
+
+  partials = blacklight_config.view_config(document_index_view_type).partials
+  locals   = { document_counter: document_counter }
+-%>
+
+<div class="<%= css -%>" <%= dataset %> itemscope <%= microdata %>>
+  <%= render_document_partials(doc, partials, locals) %>
+</div>

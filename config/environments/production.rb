@@ -1,8 +1,13 @@
-# RWL - This should actually be in Blacklight-MARC marc/indexer.rb
-require 'traject'
+# config/environments/production.rb
+#
+# frozen_string_literal: true
+# warn_indent:           true
+
+require 'traject' # This should actually be in Blacklight-MARC marc/indexer.rb
 
 Rails.application.configure do
-  # Settings specified here will take precedence over those in config/application.rb.
+
+  # Settings specified here take precedence over those in config/application.rb
 
   # Code is not reloaded between requests.
   config.cache_classes = true
@@ -18,7 +23,7 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
 
   # Attempt to read encrypted secrets from `config/secrets.yml.enc`.
-  # Requires an encryption key in `ENV["RAILS_MASTER_KEY"]` or
+  # Requires an encryption key in `ENV['RAILS_MASTER_KEY']` or
   # `config/secrets.yml.key`.
   config.read_encrypted_secrets = true
 
@@ -83,7 +88,7 @@ Rails.application.configure do
   # require 'syslog/logger'
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
 
-  if ENV["RAILS_LOG_TO_STDOUT"].present?
+  if ENV['RAILS_LOG_TO_STDOUT'].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
     config.logger    = ActiveSupport::TaggedLogging.new(logger)

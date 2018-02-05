@@ -1,0 +1,29 @@
+<%# app/views/catalog/_bookmark_control.html.erb -%>
+<%-
+  return unless current_or_guest_user && (doc = document ||= @document)
+
+  id          = doc.id.to_s
+  bookmarked  = bookmarked?(doc)
+  http_method = bookmarked ? :delete  : :put
+  action      = bookmarked ? 'remove' : 'add'
+
+  form_path = bookmark_path(doc)
+  form_opt = {
+    method:            http_method,
+    class:             'bookmark_toggle',
+    'data-doc-id':     id,
+    'data-present':    t('blacklight.search.bookmarks.present'),
+    'data-absent':     t('blacklight.search.bookmarks.absent'),
+    'data-inprogress': t('blacklight.search.bookmarks.inprogress')
+  }
+
+  button_label = t("blacklight.bookmarks.#{action}.button")
+  button_opt = {
+    id:    "bookmark_toggle_#{id.parameterize}",
+    class: "bookmark_#{action} btn btn-default"
+  }
+-%>
+
+<%= form_tag(form_path, form_opt) do %>
+  <%= submit_tag(button_label, button_opt) %>
+<%- end -%>

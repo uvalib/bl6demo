@@ -1,0 +1,23 @@
+// app/assets/stylesheets/controllers/_search_history.scss
+
+//=============================================================================
+// Search History page
+//=============================================================================
+
+.search_history {
+
+    .search-type {
+        font-size:      100%;
+        vertical-align: text-bottom;
+    }
+
+    // Put some separation between the name and the value.
+    .filterName::after {
+        content: ' ';
+    }
+
+    // Align action buttons under the "Clear" button.
+    .actions {
+        text-align: right;
+    }
+}

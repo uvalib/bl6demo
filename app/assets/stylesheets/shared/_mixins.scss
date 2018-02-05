@@ -1,0 +1,12 @@
+// app/assets/stylesheets/shared/_mixins.scss
+
+//=============================================================================
+// Common definitions for all pages.
+//=============================================================================
+
+%dd-item-format {
+    .label {
+        display:        inline-block;
+        vertical-align: text-top;
+    }
+}

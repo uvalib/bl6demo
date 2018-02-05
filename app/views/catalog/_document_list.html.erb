@@ -1,0 +1,21 @@
+<%# app/views/catalog/_document_list.html.erb -%>
+<%-
+  # NOTE: The Blacklight-provided template would require that every "lens" type
+  # have its own _document.html.erb.  This allows 'catalog/_document.html.erb'
+  # to be selected if the lens type has not defined its own partial.
+
+  docs = documents ||= @document_list
+
+  # NOTE: Haven't seen a use case for this yet, but just in case...
+  no_results = ('No results.' if docs.empty?)
+
+-%>
+<div id="documents" class="documents-<%= document_index_view_type %>">
+  <%- if no_results -%>
+    <%= no_results %>
+  <%- else -%>
+    <%- docs.each_with_index do |doc, index| -%>
+      <%= render 'document', document: doc, document_counter: index %>
+    <%- end -%>
+  <%- end -%>
+</div>

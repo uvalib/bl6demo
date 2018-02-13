@@ -7,8 +7,6 @@ __loading_begin(__FILE__)
 
 require 'blacklight/lens'
 
-require 'models/concerns/blacklight/document' unless ONLY_FOR_DOCUMENTATION
-
 # Blacklight::DocumentExt
 #
 # @see Blacklight::Document
@@ -189,7 +187,7 @@ module Blacklight::DocumentExt
       elsif block_given? # NOTE: 0% coverage for this case
         yield(self)
       end
-    unless result
+    unless result # NOTE: 0% coverage for this case
       raise KeyError, "key not found \"#{key}\"" if default.empty?
       result = default.first
     end

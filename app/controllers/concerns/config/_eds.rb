@@ -189,17 +189,19 @@ module Config::Eds
       #
       config.facet_fields.each_pair do |key, field_def|
 
-        case key.to_sym
+        key = key.to_sym
+
+        case key
           when :eds_search_limiters_facet then -1
           else                                 20
         end.tap { |limit| field_def.limit = limit if limit }
 
-        case key.to_sym
+        case key
           when :eds_search_limiters_facet then 'index'
           else                                 'count'
         end.tap { |sort| field_def.sort = sort if sort }
 
-        case key.to_sym
+        case key
           when :eds_search_limiters_facet then 'A'..'Z'
           #else                                 'A'..'Z'
           else                                 "\x20".."\x7E"
@@ -218,8 +220,10 @@ module Config::Eds
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      # NOTE: IndexPresenterExt#label displays :eds_title so it does not need to
-      # be included here.
+      # NOTE: 'Title' (:eds_title) is displayed by IndexPresenterExt#label.
+      # NOTE: 'Published in' (:eds_composed_title), if present, eliminates the
+      # need for separate :eds_source_title, :eds_publication_info, and
+      # :eds_publication_date entries.
       #
       # Begin by clearing the fields that were set by Config::Catalog.
       #
@@ -227,10 +231,7 @@ module Config::Eds
       #config.add_index_field :eds_title,                   label: 'Title'
       config.add_index_field :eds_publication_type,         label: 'Format',            helper_method: :eds_publication_type_label
       config.add_index_field :eds_authors,                  label: 'Author'
-      config.add_index_field :eds_composed_title,           label: 'Published in'
-      #config.add_index_field :eds_source_title,            label: 'Journal'    # NOTE: included in :eds_composed_title
-      #config.add_index_field :eds_publication_date,        label: 'Date'       # NOTE: included in :eds_composed_title
-      #config.add_index_field :eds_publication_info,        label: 'Published'  # NOTE: included in :eds_composed_title
+      config.add_index_field :eds_composed_title,           label: 'Published in',      helper_method: :eds_index_publication_info
       config.add_index_field :eds_languages,                label: 'Language'
       config.add_index_field :eds_html_fulltext_available,  label: 'Full text on page', helper_method: :fulltext_link
       #config.add_index_field :id,                          label: 'ID'
@@ -356,9 +357,9 @@ module Config::Eds
       # Begin by clearing the fields that were set by Config::Catalog.
       #
       config.sort_fields.clear
-      config.add_sort_field 'relevance',   label: 'Relevancy'
-      config.add_sort_field 'newest',      label: 'Date'
-      config.add_sort_field 'oldest',      label: 'Date (oldest first)'
+      config.add_sort_field :relevance, sort: 'relevance', label: 'Relevance'
+      config.add_sort_field :newest,    sort: 'newest',    label: 'Date'
+      config.add_sort_field :oldest,    sort: 'oldest',    label: 'Date (oldest first)'
 
       # === Blacklight behavior configuration ===
 

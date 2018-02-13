@@ -214,8 +214,8 @@ module Blacklight
           }.compact.join(line_break).html_safe
         if title_tag || title_class
           case title_tag
-            when nil  then title_tag = :div
-            when true then title_tag = DEF_TITLE_TAG
+            when nil  then title_tag = :div # NOTE: 0% coverage for this case
+            when true then title_tag = DEF_TITLE_TAG # NOTE: 0% coverage for this case
           end
           title_opt = {}
           title_opt[:class] = title_class if title_class
@@ -228,8 +228,8 @@ module Blacklight
           }.compact.join(line_break).html_safe
         if author_tag || author_class
           case author_tag
-            when nil  then author_tag = :div
-            when true then author_tag = DEF_TITLE_TAG
+            when nil  then author_tag = :div # NOTE: 0% coverage for this case
+            when true then author_tag = DEF_TITLE_TAG # NOTE: 0% coverage for this case
           end
           author_opt = {}
           author_opt[:class] = author_class if author_class
@@ -353,58 +353,6 @@ module Blacklight
       field_values(field_def, value: Array.wrap(values))
     end
     deprecate render_values: 'replaced by #field_value'
-=end
-
-    # =========================================================================
-    # :section:
-    # =========================================================================
-
-    public
-
-=begin # TODO: discard if there's no apparent use for this
-    # title
-    #
-    # @param [Hash, nil] options
-    #
-    # @return [String, nil]
-    #
-    # Compare with:
-    # @see Blacklight::IndexPresenterExt#title
-    #
-    def title(options = nil)
-      opt = {
-        show_title:          true,
-        show_subtitle:       true,
-        show_linked_title:   true,
-        show_authors:        false,
-        show_linked_authors: false,
-      }
-      opt.merge!(options) if options.is_a?(Hash)
-      heading(options)
-    end
-=end
-
-=begin # TODO: discard if there's no apparent use for this
-    # authors
-    #
-    # @param [Hash, nil] options
-    #
-    # @return [String, nil]
-    #
-    # Compare with:
-    # @see Blacklight::IndexPresenterExt#authors
-    #
-    def authors(options = nil)
-      opt = {
-        show_title:          false,
-        show_subtitle:       false,
-        show_linked_title:   false,
-        show_authors:        true,
-        show_linked_authors: true,
-      }
-      opt.merge!(options) if options.is_a?(Hash)
-      heading(options)
-    end
 =end
 
     # =========================================================================

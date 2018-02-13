@@ -1,0 +1,28 @@
+<%# app/views/catalog/_sort_widget.html.erb -%>
+<%-
+  return unless show_sort_and_per_page? # && active_sort_fields.many?
+  selected = current_sort_field&.key
+  button_label =
+    t('blacklight.search.sort.label', field: sort_field_label(selected))
+  menu_entries =
+    active_sort_fields.map { |key, field_def|
+      label = sort_field_label(key)
+      path  = url_for(search_state.params_for_search(sort: key))
+      opt   = {}
+      $stderr.puts "||| sort #{key.inspect} #{label.inspect}"
+      if !has_query? && (field_def.key == relevance_sort_key)
+        opt[:class] = 'disabled'
+        opt[:title] = 'Not meaningful without search terms'
+      end
+      content_tag(:li, link_to(label, path), opt)
+    }.join("\n").html_safe
+-%>
+
+<div id="sort-dropdown" class="btn-group">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    <%= button_label %>&nbsp;<span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <%= menu_entries %>
+  </ul>
+</div>

@@ -326,6 +326,8 @@ en:
 
       pagination:
         title:              'Results navigation'
+        at_beginning:       'Already at the beginning of the list.'
+        at_end:             'Already at the end of the list.'
 
       pagination_info:
         no_items_found:     'No %{entry_name} found'

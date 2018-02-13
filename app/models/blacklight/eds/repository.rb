@@ -29,17 +29,18 @@ module Blacklight::Eds
 
     EDS_DEBUG = ENV.fetch('EDS_DEBUG', !Rails.env.production?).freeze
 
+    # TODO: turn off sanitize/titleize in favor Virgo 3 code and styling
     EDS_CONFIGURATION_OPTIONS = {
       debug:      EDS_DEBUG,
       guest:      ENV.fetch('EDS_GUEST', (EDS_DEBUG ? 'false' : 'true')),
       auth:       ENV.fetch('EDS_AUTH',  'ip'),
-      log:        Rails.root.join('log', 'faraday.log'),
+      #log:        Rails.root.join('log', 'faraday.log'),
+      log:        Rails.logger,
       log_level:  ENV.fetch('EDS_LOG_LEVEL', (EDS_DEBUG ? 'DEBUG' : 'INFO')),
       timeout:      (EDS_DEBUG ? 60 : 30), # seconds
       open_timeout: (EDS_DEBUG ? 12 : 10), # in seconds
-      all_subjects_search_links:  true, # TODO: testing...
-      decode_sanitize_html:       true, # TODO: testing...
-      titleize_facets:            true, # TODO: testing...
+      decode_sanitize_html: true, # TODO: testing...
+      titleize_facets:      true, # TODO: testing...
     }.deep_freeze
 
     EDS_PARAMS = [
@@ -179,7 +180,7 @@ module Blacklight::Eds
           if @prev_next_index # [1]
             params['previous-next-index'] = @prev_next_index
             eds.solr_retrieve_previous_next(params)
-          elsif q.is_a?(Hash) && (ids = q['id']).present? # [2]
+          elsif q.is_a?(Hash) && (ids = q['id']).present? # [2] # NOTE: 0% coverage for this case
             eds.solr_retrieve_list(list: ids)
           else # [3]
             $stderr.puts("* NULL SEARCH * #{params.inspect}") if null_search # TODO: debugging - remove
@@ -285,7 +286,7 @@ module Blacklight::Eds
     # @return [EBSCO::EDS::Session]
     #
     def eds_session(caller = nil, eds_params = nil)
-      if caller.is_a?(Hash)
+      if caller.is_a?(Hash) # NOTE: 0% coverage for this case
         eds_params = caller
         caller     = nil
       end
@@ -410,7 +411,7 @@ module Blacklight::Eds
       action =
         if !@session.key?(:guest)
           'new-session'
-        elsif @reset || (@session[:guest] != @guest) # NOTE: 0% coverage for this case
+        elsif @reset || (@session[:guest] != @guest)
           'status-changed'
         end
       if action

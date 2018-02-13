@@ -13,9 +13,9 @@ require 'blacklight/lens'
 #
 module Blacklight::FacetsHelperBehaviorExt
 
-  include LensHelper
   include Blacklight::FacetsHelperBehavior
   include Blacklight::FacetExt
+  include LensHelper
 
   # ===========================================================================
   # :section: Blacklight::FacetsHelperBehavior overrides
@@ -148,7 +148,7 @@ module Blacklight::FacetsHelperBehaviorExt
   # @see Blacklight::FacetsHelperBehavior#should_render_facet?
   #
   def should_render_facet?(display_facet)
-    return unless display_facet&.items.present?
+    return unless display_facet&.items&.present?
     cfg = facet_configuration_for_field(display_facet.name)
     should_render_field?(cfg, display_facet)
   end

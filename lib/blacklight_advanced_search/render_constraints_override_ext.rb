@@ -73,7 +73,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
     result = super(req_params)
     # Advanced search constraints.
     qp = advanced_query(req_params)
-    if qp&.keyword_queries.present?
+    if qp&.keyword_queries&.present?
       queries =
         qp.keyword_queries.map { |field, query|
           label = label_for_search_field(field)
@@ -81,7 +81,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
           opt   = { remove: path.except(:controller, :action) }
           render_constraint_element(label, query, opt)
         }.join("\n").html_safe
-      if qp.keyword_queries.size > 1
+      if qp.keyword_queries.size > 1 # NOTE: 0% coverage for this case
         op = qp.keyword_op
         any_of = t("blacklight_advanced_search.op.#{op}.filter_label")
         any_of.capitalize!
@@ -115,7 +115,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
     result = [super(req_params)]
     # Advanced search constraints.
     qp = advanced_query(req_params)
-    if qp&.filters.present?
+    if qp&.filters&.present?
       op_label   = qp.keyword_op
       op_options = { class: 'text-muted constraint-connector' }
       connector  = content_tag(:strong, op_label, op_options)
@@ -128,7 +128,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
           render_constraint_element(label, values, opt)
         end
     end
-    result.reject!(&:blank?)
+    result.delete_if(&:blank?)
     safe_join(result, "\n")
   end
 
@@ -185,7 +185,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
         values = values.join(" #{qp.keyword_op} ") # e.g.: 'OR'
         render_search_to_s_element(label, values)
       end
-    result.reject!(&:blank?)
+    result.delete_if(&:blank?)
     safe_join(result, "\n")
   end
 
@@ -223,7 +223,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
           render_search_to_s_element(key_label, query)
         end
     end
-    result.reject!(&:blank?)
+    result.delete_if(&:blank?)
     safe_join(result, "\n")
   end
 
@@ -259,7 +259,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
   #
   def remove_advanced_filter_group(field, req_params = nil)
     params_hash(req_params).tap do |result|
-      if result[:f_inclusive]&.fetch(field, nil).present?
+      if result[:f_inclusive]&.fetch(field, nil)&.present?
         result[:f_inclusive] = result[:f_inclusive].dup
         result[:f_inclusive].delete(field)
         result.delete(:f_inclusive) if result[:f_inclusive].blank?

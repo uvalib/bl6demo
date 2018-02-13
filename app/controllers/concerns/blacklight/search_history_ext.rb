@@ -56,12 +56,10 @@ module Blacklight
     # This method replaces:
     # @see Blacklight::SearchHistory#clear
     #
-    # NOTE: 0% coverage for this method
-    #
     def clear
       if session[:history].clear
         flash[:notice] = I18n.t('blacklight.search_history.clear.success')
-      else
+      else # NOTE: 0% coverage for this case
         flash[:error]  = I18n.t('blacklight.search_history.clear.failure')
       end
       go_back(fallback: blacklight.search_history_path)

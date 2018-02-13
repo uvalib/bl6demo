@@ -6,8 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
-
-require 'blacklight/solr/document' #unless ONLY_FOR_DOCUMENTATION
+require 'blacklight/solr/document'
 
 # Blacklight::Solr::DocumentExt
 #

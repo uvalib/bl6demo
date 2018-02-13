@@ -7,7 +7,6 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/eds'
-#require 'ebsco/eds' unless ONLY_FOR_DOCUMENTATION
 
 # Common concerns of controllers that work with articles (EdsDocument).
 #
@@ -74,6 +73,8 @@ module EdsConcern
   # @see http://edswiki.ebscohost.com/API_Reference_Guide:_Authentication_Error_Codes
   # @see https://help.ebsco.com/interfaces/EBSCOhost/EBSCOhost_FAQs/error_message_when_log_in_to_EBSCOhost
   #
+  # NOTE: 0% coverage for this method
+  #
   def handle_ebsco_eds_error(exception)
 
     # Extract EBSCO fault information.
@@ -95,11 +96,17 @@ module EdsConcern
 
     # Act based on the type of error.
     case code.to_i
-      when 101, 102, 103, 104, 105, 106, 113, 130, 131, 132, 133, 134, 135,
+      when 101, 102, 103, 104, 105, 113, 130, 131, 132, 133, 134, 135,
         1100, 1103
         # TODO: Determine whether this is correct for all of these error codes
         logger.debug("[ignore] #{exception.class}: #{exception.message}")
         flash[:notice] = 'Please sign on to complete this article search.'
+        redirect_to articles_home_path
+      when 106
+        # EBSCO::EDS::BadRequest
+        # "Unknown error encountered"
+        logger.warn("#{exception.class}: #{exception.message}")
+        flash[:notice] = "Article search provider reports: #{message}"
         redirect_to articles_home_path
       when 107
         logger.error("#{exception.class}: #{exception.message}")
@@ -107,6 +114,10 @@ module EdsConcern
           'Your IP address has been blocked from making article searches. ' \
           'Please contact a librarian.'
         redirect_to articles_home_path
+      when 109
+        # EBSCO::EDS::BadRequest
+        # "Session Token Invalid"
+        logger.debug("[ignore] #{exception.class}: #{exception.message}")
       when 114
         # EBSCO::EDS::BadRequest
         # "Retrieval Request AN must contain a valid value."

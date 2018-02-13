@@ -64,7 +64,7 @@ module RescueConcern
     fallback_path = args.shift || fallback_path || root_path
     if respond_to?(:redirect_back)
       redirect_back opt.reverse_merge(fallback_location: fallback_path)
-    else # Deprecated in Rails 5.0
+    else # Deprecated in Rails 5.0 # NOTE: 0% coverage for this case
       redirect_to :back, opt
     end
   end
@@ -99,13 +99,7 @@ module RescueConcern
   def handle_connect_error(exception, i18n = nil)
     i18n ||= 'blacklight.search.errors.connect.general'
     flash_notice = I18n.t(i18n, error: exception.class)
-    if flash[:notice] == flash_notice
-      logger.error { "#{__method__} is looping" }
-      raise exception
-    else
-      logger.error(exception)
-      redirect_to root_path, notice: flash_notice
-    end
+    handle_generic_error(exception, flash_notice, root_path)
   end
 
   # This method is executed when Blacklight::Exceptions::InvalidRequest has
@@ -120,21 +114,39 @@ module RescueConcern
   # NOTE: 0% coverage for this method
   #
   def handle_request_error(exception, i18n = nil)
-=begin
-    # Rails own code will catch and give the usual Rails error page with stack
-    # trace.
-    raise exception if Rails.env.development? || Rails.env.test?
-=end
     # If there are errors coming from the index page, we want to trap those
     # sensibly.
     i18n ||= 'blacklight.search.errors.request_error'
     flash_notice = I18n.t(i18n)
+    handle_generic_error(exception, flash_notice, search_action_path)
+  end
+
+  # ===========================================================================
+  # :section: Exception handlers
+  # ===========================================================================
+
+  private
+
+  # handle_generic_error
+  #
+  # @param [Exception] exception
+  # @param [String]    flash_notice
+  # @param [String]    redirect_path
+  #
+  # NOTE: 0% coverage for this method
+  #
+  def handle_generic_error(exception, flash_notice, redirect_path)
     if flash[:notice] == flash_notice
       logger.error { "#{__method__} is looping" }
       raise exception
+    elsif request.xhr?
+      # TODO: not clear if this is actually the desired behavior in this case
+      logger.error(exception)
+      flash[:notice] = nil
+      flash.now[:notice] = flash_notice
     else
       logger.error(exception)
-      redirect_to search_action_path, notice: flash_notice
+      redirect_to redirect_path, notice: flash_notice
     end
   end
 

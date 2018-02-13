@@ -93,16 +93,16 @@ module Blacklight::Solr
       # the actual search field config if present. We might want to remove this
       # legacy behavior at some point. It does not seem to be currently rspec'd.
       #
-      qt = search_field&.qt.presence || blacklight_params[:qt].presence
+      qt = search_field&.qt&.presence || blacklight_params[:qt].presence
       solr_params[:qt] = qt if qt
-      solr_parameters = search_field&.solr_parameters.presence
+      solr_parameters = search_field&.solr_parameters&.presence
       solr_params.merge!(solr_parameters) if solr_parameters
 
       # Create Solr 'q' including the user-entered q, prefixed by any Solr
       # LocalParams in config, using Solr LocalParams syntax.
       # @see http://wiki.apache.org/solr/LocalParams
       #
-      solr_local_parameters = search_field&.solr_local_parameters.presence
+      solr_local_parameters = search_field&.solr_local_parameters&.presence
       q =
         if solr_local_parameters
           local_params =
@@ -111,6 +111,7 @@ module Blacklight::Solr
             }.join(' ')
           "{!#{local_params}}#{blacklight_params[:q]}"
         elsif q.is_a?(Hash)
+          solr_params[:defType]    = 'lucene'
           solr_params[:spellcheck] = 'false'
           terms =
             if blacklight_params[:q].values.any?(&:blank?)
@@ -363,15 +364,15 @@ module Blacklight::Solr
     # in Solr request (no @response available), and used in display (with
     # @response available) to create a facet paginator with the right limit.
     #
-    # @param [String, Symbol] facet_field
+    # @param [String, Symbol] facet
     #
     # @param [Integer, nil]
     #
     # This method overrides:
     # @Blacklight::Solr::SearchBuilderBehavior#facet_limit_for
     #
-    def facet_limit_for(facet_field)
-      limit = blacklight_config.facet_fields[facet_field]&.limit
+    def facet_limit_for(facet)
+      limit = blacklight_config.facet_fields[facet.to_s]&.limit
       limit = blacklight_config.default_facet_limit if limit.is_a?(TrueClass)
       limit
     end
@@ -442,6 +443,7 @@ module Blacklight::Solr
     # @Blacklight::Solr::SearchBuilderBehavior#facet_value_to_fq_string
     #
     def facet_value_to_fq_string(facet_field, value)
+      facet_field  = facet_field.to_s
       facet_config = blacklight_config.facet_fields[facet_field]
       query = facet_config&.query
       if query

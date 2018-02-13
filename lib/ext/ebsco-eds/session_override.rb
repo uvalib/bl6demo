@@ -16,6 +16,168 @@ override EBSCO::EDS::Session do
 
   public
 
+  # Creates a new session.
+  #
+  # This can be done in one of two ways:
+  #
+  # === 1. Environment variables
+  # * +EDS_AUTH+ - authentication method: 'ip' or 'user'
+  # * +EDS_PROFILE+ - profile ID for the EDS API
+  # * +EDS_USER+ - user id attached to the profile
+  # * +EDS_PASS+ - user password
+  # * +EDS_GUEST+ - allow guest access: 'y' or 'n'
+  # * +EDS_ORG+ - name of your institution or company
+  #
+  # ==== Example
+  # Once you have environment variables set, simply create a session like this:
+  #   session = EBSCO::EDS::Session.new
+  #
+  # ===  2. \Options
+  # * +:auth+
+  # * +:profile+
+  # * +:user+
+  # * +:pass+
+  # * +:guest+
+  # * +:org+
+  #
+  # ==== Example
+  #   session = EBSCO::EDS::Session.new {
+  #     :auth => 'user',
+  #     :profile => 'edsapi',
+  #     :user => 'joe'
+  #     :pass => 'secret',
+  #     :guest => false,
+  #     :org => 'Acme University'
+  #   }
+  #
+  def initialize(options = nil)
+
+    # Use override values from the indicated file (default 'eds.yml') if
+    # present or the default configuration if there was some problem with
+    # the YAML file (bad syntax, not found, etc.).
+    options ||= {}
+    eds_config = EBSCO::EDS::Configuration.new
+    @config = eds_config.configure_with(options[:config])
+    @config ||= eds_config.configure(options.except(:config))
+
+    # Properties that are not in the configuration.
+    @user    = options[:user]    || ENV['EDS_USER']
+    @pass    = options[:pass]    || ENV['EDS_PASS']
+    @profile = options[:profile] || ENV['EDS_PROFILE']
+
+    unless @profile.present?
+      raise EBSCO::EDS::InvalidParameter,
+            'Session must specify a valid api profile.'
+    end
+
+    # Configuration options can be overridden by environment variables.
+    @org       = ENV['EDS_ORG']       || @config[:org]
+    @auth_type = ENV['EDS_AUTH']      || @config[:auth]
+    @log_level = ENV['EDS_LOG_LEVEL'] || @config[:log_level]
+    @cache_dir = ENV['EDS_CACHE_DIR'] || @config[:eds_cache_dir]
+
+    # Boolean configuration options can be overridden by environment variables.
+    @guest =
+      if (env_value = ENV['EDS_GUEST'])
+        !%w(false no n).include?(env_value.downcase)
+      elsif @config.key?(:guest)
+        @config[:guest]
+      else
+        true
+      end
+
+    @use_cache =
+      if (env_value = ENV['EDS_USE_CACHE'])
+        !%w(false no n).include?(env_value.downcase)
+      else
+        @config[:use_cache]
+      end
+
+    @debug =
+      if (env_value = ENV['EDS_DEBUG'])
+        %w(true yes y).include?(env_value.downcase)
+      else
+        @config[:debug]
+      end
+
+    @recover_130 =
+      if (env_value = ENV['EDS_RECOVER_FROM_BAD_SOURCE_TYPE'])
+        %w(true yes y).include?(env_value.downcase)
+      else
+        @config[:recover_from_bad_source_type]
+      end
+
+    @api_hosts_list =
+      if (env_value = ENV['EDS_HOSTS'])
+        env_value.to_s.split(/\s*,\s*/)
+      else
+        @config[:api_hosts_list].presence || []
+      end
+
+    # Setup logging.
+    @logger =
+      case (log = options[:log] || (@config[:log] if @debug)).presence
+        when Logger
+          log
+        when String, Pathname
+          unless log.to_s.start_with?('/')
+            tmp_root = ENV.fetch('TMPDIR', '/tmp')
+            log = File.join(tmp_root, log)
+          end
+          Logger.new(log).tap { |l| l.level = Logger.const_get(@log_level) }
+      end
+
+    # Setup caching options that will be used in #connection.
+    @cache_opt =
+      if @use_cache
+        {
+          store:      :file_store,
+          cache_dir:  @cache_dir,
+          logger:     @logger,
+        }
+      end
+
+    # Other values that need to be initialized.
+    @conn_adapter   = @config[:adapter]
+    @api_host_index = 0
+    @current_page   = 0
+    @search_options = nil
+
+    # Setup connection options.
+    # @see Faraday::Connection#initialize
+    # @see Faraday::ConnectionOptions#initialize
+    @conn_opt = {
+      url: ('https://' + @api_hosts_list[@api_host_index]),
+      headers: {
+        'Content-Type' => 'application/json;charset=UTF-8',
+        'Accept'       => 'application/json',
+        'User-Agent'   => @config[:user_agent],
+      },
+      request: {
+        timeout:      @config[:timeout],
+        open_timeout: @config[:open_timeout],
+      }
+    }
+
+    # Establish session properties, acquiring them remotely as needed.
+    @auth_token    = options[:auth_token].presence    || create_auth_token
+    @session_token = options[:session_token].presence || create_session_token
+
+    # Get search characteristics (from cache when possible).
+    info  = do_request(:get, path: @config[:info_url])
+    @info = EBSCO::EDS::Info.new(info, @config)
+
+    if @debug
+      if options.key?(:caller)
+        puts 'SESSION CALLER: ' + options[:caller].inspect
+        puts 'CALLER OPTIONS: ' + options.inspect
+      end
+      puts 'AUTH TOKEN:    ' + @auth_token.inspect
+      puts 'SESSION TOKEN: ' + @session_token.inspect
+    end
+
+  end
+
   # Performs a search.
   #
   # @param [Hash]    options
@@ -102,23 +264,34 @@ override EBSCO::EDS::Session do
   #
   def search(options = {}, add_actions = false, increment_page = true)
 
+    $stderr.puts "****************** #{__method__} options = #{options.pretty_inspect}"
     options = options.deep_stringify_keys
     @search_results = nil
 
+    # Create/recreate the search options if nil or not passing actions.
+    search = (@search_options if add_actions)
+    search ||= EBSCO::EDS::Options.new(options, @info)
+    $stderr.puts "****************** #{__method__} EBSCO::EDS::Options = #{search.pretty_inspect}"
+
     # Only perform a search when there are query terms since certain EDS
     # profiles will throw errors when given empty queries.
+=begin
     if (options.keys & %w(query q)).present?
-
+=end
+    if search.SearchCriteria.Queries.present?
+      @search_options = search
+=begin
       # Create/recreate the search options if nil or not passing actions.
       @search_options = nil unless add_actions
       @search_options ||= EBSCO::EDS::Options.new(options, @info)
+=end
 
       # Get search results.
       @search_results = get_results(@search_options, options)
       @current_page   = @search_results.page_number if increment_page
       $stderr.puts "||| EBSCO #{__method__}: @search_options = #{@search_options.pretty_inspect}"    # TODO: debugging - remove
-      $stderr.puts "||| EBSCO #{__method__}: response = #{@search_results.results.pretty_inspect}"   # TODO: debugging - remove
 =begin
+      $stderr.puts "||| EBSCO #{__method__}: response = #{@search_results.results.pretty_inspect}"   # TODO: debugging - remove
 =end
       $stderr.puts "||| EBSCO #{__method__}: @config = #{@config}"                                   # TODO: debugging - remove
 =begin
@@ -129,7 +302,7 @@ override EBSCO::EDS::Session do
       # Create temporary facet results if needed.
       # TODO: should this also be considering 'f_inclusive' facets?
       facets = options['f']
-      if facets.present?
+      if facets.present? # NOTE: 0% coverage for this case
         # Create temporary format facet results if needed.
         target_facet = 'eds_publication_type_facet'
         if facets.key?(target_facet)
@@ -152,13 +325,13 @@ override EBSCO::EDS::Session do
         end
       end
 
-    elsif @search_options.present? #options.blank? && @search_options.present?
+    elsif @search_options.present? # NOTE: 0% coverage for this case
 
       # Use existing/updated SearchOptions.
       @search_results = get_results(@search_options, options)
       @current_page   = @search_results.page_number if increment_page
 
-    else
+    else # NOTE: 0% coverage for this case
 
       @search_results = EBSCO::EDS::Results.new(empty_results, @config)
 
@@ -177,13 +350,48 @@ override EBSCO::EDS::Session do
   # @see EBSCO::EDS::Session#do_request
   #
   def do_request(method, path:, payload: nil, attempt: 0)
-    if @debug
+    if @debug # NOTE: 0% coverage for this case
       puts 'EDS REQUEST ' \
             "method #{method.inspect}, " \
             "path #{path.inspect}, " \
             "payload #{payload.pretty_inspect}"
     end
     super # Call the original method.
+  end
+
+  # ===========================================================================
+  # :section: Replacement methods
+  # ===========================================================================
+
+  private
+
+  # connection
+  #
+  # @param [Boolean, nil] use_cache   Default: @use_cache.
+  #
+  # @return [Faraday::Connection]
+  #
+  def connection(use_cache = @use_cache)
+    Faraday.new(@conn_opt) do |conn|
+      conn.headers['x-sessionToken']        = @session_token
+      conn.headers['x-authenticationToken'] = @auth_token
+      conn.use :eds_caching_middleware, @cache_opt if use_cache
+      conn.use :eds_exception_middleware
+      conn.request  :url_encoded
+      conn.response :json, content_type: /\bjson$/
+      conn.response :detailed_logger, @logger if @debug
+      conn.adapter  @conn_adapter
+    end
+  end
+
+  # Same as above but no caching.
+  #
+  # @return [Faraday::Connection]
+  #
+  # NOTE: 0% coverage for this method
+  #
+  def jump_connection
+    connection(false)
   end
 
   # ===========================================================================

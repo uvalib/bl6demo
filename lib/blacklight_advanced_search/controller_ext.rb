@@ -6,7 +6,6 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
-
 require 'blacklight_advanced_search/parsing_nesting_parser'
 
 # This module gets included into CatalogController, or another SearchHelper
@@ -34,6 +33,7 @@ module BlacklightAdvancedSearch::ControllerExt
     helper BlacklightAdvancedSearch::CatalogHelperOverrideExt
 
     helper_method :is_advanced_search?, :advanced_query
+    helper_method :has_search_parameters?, :has_query?
 
   end
 
@@ -69,6 +69,40 @@ module BlacklightAdvancedSearch::ControllerExt
     req_params ||= params
     return unless is_advanced_search?(req_params)
     BlacklightAdvancedSearch::QueryParserExt.new(req_params, blacklight_config)
+  end
+
+  # ===========================================================================
+  # :section:
+  # ===========================================================================
+
+  public
+
+  # has_query?
+  #
+  # @param [ActionController::Parameters, Hash, nil] req_params  Def: `params`.
+  #
+  # During operation this method overrides:
+  # @see Blacklight::CatalogExt#has_search_parameters?
+  #
+  def has_search_parameters?(req_params = nil)
+    p = req_params || params
+    %i(q search_field f f_inclusive).any? { |field| p[field].present? }
+  end
+
+  # Indicate whether there has been a query issued by the user.
+  #
+  # @param [ActionController::Parameters, Hash, nil] req_params  Def: `params`.
+  #
+  # During operation this method overrides:
+  # @see Blacklight::CatalogExt#has_query?
+  #
+  def has_query?(req_params = nil)
+    p = req_params || params
+    if p[:search_field] == blacklight_config.advanced_search[:url_key]
+      blacklight_config.search_fields.keys.any? { |key| p[key].present? }
+    else
+      p[:q].present? && (p[:q] != '*')
+    end
   end
 
 end

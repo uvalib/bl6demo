@@ -49,7 +49,7 @@ module ExportHelper
     opt = { vendor: application_name, filter: 'MARC Format' }
 =end
     case url_params
-      when Hash   then opt.merge!(url_params)
+      when Hash   then opt.merge!(url_params) # NOTE: 0% coverage for this case
       when String then opt[:url] = url_params
     end
     url_params = opt.map { |k, v| "#{k}=" + CGI.escape(v.to_s) }.join('&')
@@ -71,6 +71,8 @@ module ExportHelper
   # Compare with:
   # @see BlacklightMarcHelper#refworks_solr_document_path
   #
+  # NOTE: 0% coverage for this method
+  #
   def refworks_solr_document_path(options = nil)
     refworks_document_path(options)
   end
@@ -86,6 +88,8 @@ module ExportHelper
   # Compare with:
   # @see BlacklightMarcHelper#single_endnote_catalog_path
   #
+  # NOTE: 0% coverage for this method
+  #
   def single_endnote_catalog_path(options = nil)
     endnote_document_path(options)
   end
@@ -98,6 +102,8 @@ module ExportHelper
   #
   # Compare with:
   # @see BlacklightMarcHelper#render_refworks_texts
+  #
+  # NOTE: 0% coverage for this method
   #
   def render_refworks_texts(documents)
     documents.map { |doc|
@@ -114,6 +120,8 @@ module ExportHelper
   # Compare with:
   # @see BlacklightMarcHelper#render_endnote_texts
   #
+  # NOTE: 0% coverage for this method
+  #
   def render_endnote_texts(documents)
     documents.map { |doc|
       doc.export_as(:endnote) if doc.exports_as?(:endnote)
@@ -128,6 +136,8 @@ module ExportHelper
   #
   # @see BlacklightMarcHelper#render_refworks_texts
   # @see BlacklightMarcHelper#render_endnote_texts
+  #
+  # NOTE: 0% coverage for this method
   #
   def render_ris_texts(documents)
     documents.map { |doc|
@@ -182,6 +192,8 @@ module ExportHelper
   # @options url_params [String] :id        Required: Document ID.
   #
   # @return [String, nil]
+  #
+  # NOTE: 0% coverage for this method
   #
   def ris_document_path(*args)
     opt = { action: 'show', format: :ris, only_path: true }

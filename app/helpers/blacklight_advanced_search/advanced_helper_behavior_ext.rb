@@ -101,8 +101,8 @@ module BlacklightAdvancedSearch
     #
     def search_fields_for_advanced_search
       @search_fields_for_advanced_search ||=
-        blacklight_config.search_fields.select do |_k, v|
-          (inc = v.include_in_advanced_search) || inc.nil?
+        blacklight_config.search_fields.reject do |_key, field_def|
+          field_def.include_in_advanced_search.is_a?(FalseClass)
         end
     end
 
@@ -117,8 +117,8 @@ module BlacklightAdvancedSearch
     #
     def facet_field_names_for_advanced_search
       @facet_field_names_for_advanced_search ||=
-        blacklight_config.facet_fields.select { |_k, v|
-          (inc = v.include_in_advanced_search) || inc.nil?
+        blacklight_config.facet_fields.reject { |_key, field_def|
+          field_def.include_in_advanced_search.is_a?(FalseClass)
         }.values.map(&:field)
     end
 

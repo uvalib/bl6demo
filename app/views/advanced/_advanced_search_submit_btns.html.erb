@@ -5,7 +5,7 @@
     request.path.include?('/articles/') || request.path.end_with?('/articles')
 
   sort_label  = t('blacklight_advanced_search.form.sort_label')
-  sort_value  = current_sort_field&.key || ''
+  sort_value  = current_sort_field&.key.to_s
   sort_menu   = options_for_select(sort_fields, h(sort_value))
 
   adv_key     = blacklight_config.advanced_search[:url_key]

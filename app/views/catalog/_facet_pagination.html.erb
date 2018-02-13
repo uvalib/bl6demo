@@ -1,0 +1,51 @@
+<%# app/views/catalog/_facet_pagination.html.erb -%>
+<%-
+  ss  = search_state.to_h
+  opt = { data: { ajax_modal: 'preserve' } }
+
+  prev_label = raw(t('views.pagination.previous'))
+  next_label = raw(t('views.pagination.next'))
+  prev_opt = next_opt =
+    opt.merge(
+      params:     ss,
+      param_name: blacklight_config.facet_paginator_class.request_keys[:page],
+      class:      'btn btn-link',
+    )
+
+  current_page = @pagination.current_page
+
+  index_sort_label = t('blacklight.search.facets.sort.index')
+  count_sort_label = t('blacklight.search.facets.sort.count')
+  index_sort_path  = @pagination.params_for_resort_url('index', ss)
+  count_sort_path  = @pagination.params_for_resort_url('count', ss)
+  index_sort_opt   = opt.merge(class: 'sort_change az btn btn-default')
+  count_sort_opt   = opt.merge(class: 'sort_change numeric btn btn-default')
+-%>
+
+<div class="prev_next_links btn-group">
+  <%= link_to_previous_page(@pagination, prev_label, prev_opt) do -%>
+    <span class="disabled btn btn-disabled"><%= prev_label %></span>
+  <%- end -%>
+
+  <%= link_to_next_page(@pagination, next_label, next_opt) do -%>
+    <span class="disabled btn btn-disabled"><%= next_label %></span>
+  <%- end -%>
+</div>
+
+<div class="current-page btn btn-group">
+  <%= "[&thinsp;#{current_page}&thinsp;]".html_safe if current_page > 1 %>
+</div>
+
+<div class="sort_options btn-group">
+  <%- if @pagination.sort == 'index' -%>
+
+    <span class="active az btn btn-default"><%= index_sort_label %></span>
+    <%= link_to(count_sort_label, count_sort_path, count_sort_opt) %>
+
+  <%- elsif @pagination.sort == 'count' -%>
+
+    <%= link_to(index_sort_label, index_sort_path, index_sort_opt) %>
+    <span class="active numeric btn btn-default"><%= count_sort_label %></span>
+
+  <%- end -%>
+</div>

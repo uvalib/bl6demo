@@ -51,7 +51,7 @@ module LensHelper
     fallback = current_lens_key
     obj ||= fallback
     lens = Blacklight::Lens[obj]
-    unless lens # NOTE: 0% coverage for this case
+    unless lens
       unless Blacklight::Lens.empty?
         logger.error("Blacklight::Lens#table has no entry for #{obj}")
       end

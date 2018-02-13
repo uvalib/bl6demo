@@ -139,13 +139,10 @@ module Blacklight::BookmarksExt
     if request.xhr?
       if success
         render json: { bookmarks: { count: count } }
-      else
-=begin
-        render plain: '', status: 500
-=end
+      else # NOTE: 0% coverage for this case
         head 500
       end
-    else
+    else # NOTE: 0% coverage for this case
       if success
         go_back notice: t('blacklight.bookmarks.add.success', count: count)
       else
@@ -161,6 +158,8 @@ module Blacklight::BookmarksExt
   #
   # This method replaces:
   # @see Blacklight::Bookmarks#destroy
+  #
+  # NOTE: 0% coverage for this method
   #
   def destroy
     table    = current_or_guest_user.bookmarks
@@ -192,13 +191,11 @@ module Blacklight::BookmarksExt
   # This method replaces:
   # @see Blacklight::Bookmarks#clear
   #
-  # NOTE: 0% coverage for this method
-  #
   def clear
     table = current_or_guest_user.bookmarks
     if table.clear
       flash[:notice] = t('blacklight.bookmarks.clear.success')
-    else
+    else # NOTE: 0% coverage for this case
       flash[:error]  = t('blacklight.bookmarks.clear.failure')
     end
     redirect_to action: 'index'

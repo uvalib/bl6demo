@@ -13,8 +13,8 @@ require 'blacklight/lens'
 #
 module Blacklight::ConfigurationHelperBehaviorExt
 
-  include LensHelper
   include Blacklight::ConfigurationHelperBehavior
+  include LensHelper
 
   # ===========================================================================
   # :section: Blacklight::ConfigurationHelperBehavior overrides
@@ -26,7 +26,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   #
   # @param [Object, nil] lens         Default: `current_lens`.
   #
-  # @return [Array<Blacklight::Configuration::Field>]
+  # @return [ActiveSupport::OrderedHash{String=>Blacklight::Configuration::Field}]
   #
   # This method overrides:
   # @see Blacklight::ConfigurationHelperBehavior#index_fields
@@ -56,7 +56,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   #
   # @param [Object, nil] lens         Default: `current_lens`.
   #
-  # @return [Array<Blacklight::Configuration::SortField>]
+  # @return [ActiveSupport::OrderedHash{String=>Blacklight::Configuration::SortField}]
   #
   # This method overrides:
   # @see Blacklight::ConfigurationHelperBehavior#active_sort_fields
@@ -93,8 +93,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # @see Blacklight::ConfigurationHelperBehavior#search_field_options_for_select
   #
   def search_field_options_for_select(lens = nil)
-    blacklight_config(lens).search_fields.map { |_, field_def|
-      key = field_def.key
+    blacklight_config(lens).search_fields.map { |key, field_def|
       [label_for_search_field(key), key] if should_render_field?(field_def)
     }.compact
   end
@@ -103,7 +102,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   #
   # @param [Object, nil] lens         Default: `current_lens`.
   #
-  # @return [Array<Blacklight::Configuration::Field>]
+  # @return [ActiveSupport::OrderedHash{String=>Blacklight::Configuration::Field}]
   #
   # This method overrides:
   # @see Blacklight::ConfigurationHelperBehavior#document_show_fields
@@ -142,7 +141,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # @see Blacklight::ConfigurationHelperBehavior#default_search_field?
   #
   def default_search_field?(field)
-    field.blank? || (field == default_search_field&.fetch(:key, nil))
+    field.blank? || (field.to_s == default_search_field.key)
   end
 =end
 
@@ -157,6 +156,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # @see Blacklight::ConfigurationHelperBehavior#index_field_label
   #
   def index_field_label(lens, field)
+    field = field.to_s
     return '' unless field.present?
     lens      = lens_key_for(lens)
     field_def = index_fields(lens)[field]
@@ -166,7 +166,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
       :"blacklight.search.fields.index.#{field}",
       :"blacklight.search.fields.#{field}",
       field_def&.label,
-      field.to_s.humanize
+      field.humanize
     )
   end
 
@@ -181,6 +181,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # @see Blacklight::ConfigurationHelperBehavior#document_show_field_label
   #
   def document_show_field_label(lens, field)
+    field = field.to_s
     return '' unless field.present?
     lens      = lens_key_for(lens)
     field_def = document_show_fields(lens)[field]
@@ -190,7 +191,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
       :"blacklight.search.fields.show.#{field}",
       :"blacklight.search.fields.#{field}",
       field_def&.label,
-      field.to_s.humanize
+      field.humanize
     )
   end
 
@@ -204,6 +205,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # @see Blacklight::ConfigurationHelperBehavior#facet_field_label
   #
   def facet_field_label(field)
+    field = field.to_s
     return '' unless field.present?
     lens      = current_lens.key
     field_def = blacklight_config(lens).facet_fields[field]
@@ -213,7 +215,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
       :"blacklight.search.fields.facet.#{field}",
       :"blacklight.search.fields.#{field}",
       field_def&.label,
-      field.to_s.humanize
+      field.humanize
     )
   end
 
@@ -229,6 +231,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # NOTE: 0% coverage for this method
   #
   def view_label(view)
+    view = view.to_s
     return '' unless view.present?
     lens        = current_lens.key
     view_config = blacklight_config(lens).view[view]
@@ -239,7 +242,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
       :"blacklight.search.view.#{view}",
       view_config&.label,
       view_config&.title,
-      view.to_s.humanize
+      view.humanize
     )
   end
 
@@ -254,17 +257,17 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # @see Blacklight::ConfigurationHelperBehavior#label_for_search_field
   #
   def label_for_search_field(key)
+    key = key.to_s
     return '' unless key.present?
     lens      = current_lens.key
     field_def = blacklight_config(lens).search_fields[key]
-    key       = field_def&.key || key
     field_label(
       :"blacklight.#{lens}.search.fields.search.#{key}",
       :"blacklight.#{lens}.search.fields.#{key}",
       :"blacklight.search.fields.search.#{key}",
       :"blacklight.search.fields.#{key}",
       field_def&.label,
-      key.to_s.humanize
+      key.humanize
     )
   end
 
@@ -278,6 +281,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # @see Blacklight::ConfigurationHelperBehavior#sort_field_label
   #
   def sort_field_label(key)
+    key = key.to_s
     return '' unless key.present?
     lens      = current_lens.key
     field_def = blacklight_config(lens).sort_fields[key]
@@ -285,7 +289,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
       :"blacklight.#{lens}.search.fields.sort.#{key}",
       :"blacklight.search.fields.sort.#{key}",
       field_def&.label,
-      key.to_s.humanize
+      key.humanize
     )
   end
 
@@ -318,7 +322,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   #
   # @param [Object, nil] lens         Default: `current_lens`.
   #
-  # @return [Array<Blacklight::Configuration::ViewConfig>]
+  # @return [ActiveSupport::OrderedHash{String=>Blacklight::Configuration::ViewConfig}]
   #
   # This method overrides:
   # @see Blacklight::ConfigurationHelperBehavior#document_index_views
@@ -334,7 +338,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   #
   # @param [Object, nil] lens         Default: `current_lens`.
   #
-  # @return [Hash]
+  # @return [ActiveSupport::OrderedHash{String=>Blacklight::Configuration::ViewConfig}]
   #
   # This method overrides:
   # @see Blacklight::ConfigurationHelperBehavior#document_index_view_controls
@@ -409,7 +413,7 @@ module Blacklight::ConfigurationHelperBehaviorExt
   #
   def document_show_link_field(doc = nil, options = nil)
     config = blacklight_config(doc)
-    type   = document_index_view_type # TODO: lens?
+    type   = document_index_view_type
     fields = config.view_config(type).title_field
     fields = Array.wrap(fields)
     if doc.is_a?(Blacklight::Document)
@@ -428,10 +432,12 @@ module Blacklight::ConfigurationHelperBehaviorExt
   # This method overrides:
   # @see Blacklight::ConfigurationHelperBehavior#default_sort_field
   #
+  # NOTE: 0% coverage for this method
+  #
   def default_sort_field(lens = nil)
     fields = active_sort_fields(lens)
     field  = fields.find { |_, field_def| field_def.default } || fields.first
-    field&.last
+    field.last
   end
 
   # The default value for search results per page.
@@ -479,6 +485,68 @@ module Blacklight::ConfigurationHelperBehaviorExt
       .evaluate_if_unless_configuration(field_def, *args)
   end
 =end
+
+  # ===========================================================================
+  # :section:
+  # ===========================================================================
+
+  public
+
+  # The sort key for the first sort field entry of the current Blacklight
+  # configuration.
+  #
+  # @param [Object, nil] lens         Default: `current_lens`.
+  #
+  # @return [String]
+  #
+  # NOTE: 0% coverage for this method
+  #
+  def default_sort_key(lens = nil)
+    first_sort_key(lens)
+  end
+
+  # The sort key associated with relevance sort for the current Blacklight
+  # configuration.
+  #
+  # @param [Object, nil] lens         Default: `current_lens`.
+  #
+  # @return [String, nil]
+  #
+  def relevance_sort_key(lens = nil)
+    first_sort_key(lens, %w(relevance relevancy))
+  end
+
+  # The sort key associated with date-received sort for the current
+  # Blacklight configuration.
+  #
+  # @param [Object, nil] lens         Default: `current_lens`.
+  #
+  # @return [String, nil]
+  #
+  def date_received_sort_key(lens = nil)
+    first_sort_key(lens, %w(received newest))
+  end
+
+  # ===========================================================================
+  # :section:
+  # ===========================================================================
+
+  private
+
+  # The sort key for the first matching sort entry for the current Blacklight
+  # configuration.
+  #
+  # @param [Object, nil] lens         Default: `current_lens`.
+  # @param [Array, nil]  targets
+  #
+  # @return [String, nil]
+  #
+  def first_sort_key(lens = nil, targets = nil)
+    targets = Array.wrap(targets).presence
+    active_sort_fields(lens).find { |key, _|
+      return key if !targets|| targets.include?(key)
+    }
+  end
 
 end
 

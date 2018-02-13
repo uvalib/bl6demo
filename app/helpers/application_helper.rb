@@ -136,7 +136,7 @@ module ApplicationHelper
       when Hash, Blacklight::Configuration::Field
         opt   = extract_config_options(value[:config], opt)
         value = value[:value]
-      when Array
+      when Array # NOTE: 0% coverage for this case
         opt   = opt.merge(separator: HTML_NEW_LINE) unless opt.key?(:separator)
     end
     return value, opt
@@ -162,7 +162,7 @@ module ApplicationHelper
     opt ||= {}
     if config.present?
       opt = opt.merge(config[:html_options] || {})
-      if config.key?(:separator)
+      if config.key?(:separator) # NOTE: 0% coverage for this case
         opt.merge!(separator: config[:separator])
       elsif config[:separator_options].present?
         opt.merge!(separator: config[:separator_options].first.last)

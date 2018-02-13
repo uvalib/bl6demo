@@ -141,8 +141,7 @@ module Blacklight
     #
     def external_stylesheets(*args)
       tags, paths = args.partition { |arg| arg.include?('<link') }
-      paths = EXTERNAL_FONTS + paths
-      paths.reject!(&:blank?)
+      paths = (EXTERNAL_FONTS + paths).reject(&:blank?)
       tags  = tags.reject(&:blank?).uniq.join(META_TAG_SEPARATOR).html_safe
       stylesheet_link_tag(*paths) + tags
     end
@@ -157,8 +156,7 @@ module Blacklight
     #
     def external_scripts(*args)
       tags, paths = args.partition { |arg| arg.include?('<script') }
-      paths = EXTERNAL_SCRIPTS + [DEFAULT_JQUERY] + paths
-      paths.reject!(&:blank?)
+      paths = (EXTERNAL_SCRIPTS + [DEFAULT_JQUERY] + paths).reject(&:blank?)
       tags << ACCESS_ANALYTICS
       tags  = tags.reject(&:blank?).uniq.join(META_TAG_SEPARATOR).html_safe
       javascript_include_tag(*paths) + tags

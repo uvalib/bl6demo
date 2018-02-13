@@ -224,15 +224,33 @@ module Blacklight::SearchHelperExt
   # This method overrides:
   # @see Blacklight::SearchHelper#fetch_many
   #
+  # Compare with (for articles search):
+  # @see Blacklight::Eds::SearchService#fetch_many
+  #
   def fetch_many(ids, user_params = nil, solr_params = nil)
-    query =
-      search_builder
-        .with(user_params || {})
-        .where(blacklight_config.document_model.unique_key => ids)
-        .merge(solr_params || {})
-        .merge(fl: '*')
-    response = repository.search(query)
-    [response, response.documents]
+
+    # Get each item from its appropriate repository one-at-a-time rather than
+    # as a batch (search) request.  This is for two reasons:
+    # 1. Ensure that each failed item is indicated with a *nil* value.
+    # 2. To better support cache management.
+    response_hash = {}
+    response_docs = {}
+    Array.wrap(ids).each do |id|
+      next if response_hash[id] && response_docs[id]
+      response, document = fetch_one(id, solr_params)
+      response &&= response['response']
+      response &&= response['doc'] || response['docs']
+      response_hash[id] = Array.wrap(response).first || document&.to_h
+      response_docs[id] = document
+    end
+
+    # Manufacture a response from the sets of document hash values.
+    response_params = Blacklight::Parameters.sanitize(user_params)
+    response = Blacklight::Solr::Response.new({}, response_params)
+    response['response'] ||= {}
+    response['response']['docs'] = response_hash.values
+    return response, response_docs.values
+
   end
 
   # Retrieve a single document by id.
@@ -244,6 +262,9 @@ module Blacklight::SearchHelperExt
   #
   # This method overrides:
   # @see Blacklight::SearchHelper#fetch_one
+  #
+  # Compare with (for articles search):
+  # @see Blacklight::Eds::SearchService#fetch_one
   #
   def fetch_one(id, solr_params = nil)
     solr_params ||= {}

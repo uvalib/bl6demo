@@ -18,7 +18,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   extend Deprecation
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # Using required_dependency to work around Rails autoloading
   # problems when developing blacklight. Without this, any change
   # to this class breaks other classes in this namespace
@@ -31,7 +31,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   require_dependency 'blacklight/solr/response/group'
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   include PaginationMethods
   include Spelling
   include Facets
@@ -48,12 +48,12 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
 
   public
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   attr_reader :request_params
   attr_accessor :document_model, :blacklight_config
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # Initialize a self instance.
   #
   # @param [String] data
@@ -75,7 +75,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # header
   #
   # @return [Hash]
@@ -88,7 +88,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # params
   #
   # @return [Hash]
@@ -101,7 +101,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # start
   #
   # @return [Integer]
@@ -114,7 +114,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # rows
   #
   # @return [Integer]
@@ -127,7 +127,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # sort
   #
   # @return [String, nil]
@@ -140,7 +140,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # documents
   #
   # @return [Array<EdsDocument>]
@@ -155,7 +155,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   alias_method :docs, :documents
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # Grouped responses can either be grouped by:
   #   - field, where this key is the field name, and there will be a list
   #        of documents grouped by field value, or:
@@ -181,7 +181,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # group
   #
   # @param [String] key
@@ -196,7 +196,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # grouped?
   #
   # This method overrides:
@@ -207,7 +207,7 @@ class Blacklight::Eds::Response < Blacklight::Solr::Response
   end
 =end
 
-=begin # NOTE: using base method
+=begin # NOTE: using base version
   # export_formats
   #
   # @return [Array<String>]

@@ -284,20 +284,29 @@ class Config::SolrFake
 
       # "Title" search selection.
       config.add_search_field(:title) do |field|
-        field.solr_parameters = { 'spellcheck.dictionary': 'title' }
-        field.solr_local_parameters = { qf: '$title_qf', pf: '$title_pf' }
+        field.solr_local_parameters = {
+          'spellcheck.dictionary': 'title',
+          qf: '${title_qf}',
+          pf: '${title_pf}'
+        }
       end
 
       # "Author" search selection.
       config.add_search_field(:author) do |field|
-        field.solr_parameters = { 'spellcheck.dictionary': 'author' }
-        field.solr_local_parameters = { qf: '$author_qf', pf: '$author_pf' }
+        field.solr_local_parameters = {
+          'spellcheck.dictionary': 'author',
+          qf: '${author_qf}',
+          pf: '${author_pf}'
+        }
       end
 
       # "Subject" search selection.
       config.add_search_field(:subject) do |field|
-        field.solr_parameters = { 'spellcheck.dictionary': 'subject' }
-        field.solr_local_parameters = { qf: '$subject_qf', pf: '$subject_pf' }
+        field.solr_local_parameters = {
+          'spellcheck.dictionary': 'subject',
+          qf: '${subject_qf}',
+          pf: '${subject_pf}'
+        }
         # Specifying a :qt only to show it's possible, and so our internal
         # automated tests can test it. In this case it's the same as
         # config[:default_solr_parameters][:qt], so isn't actually necessary.
@@ -317,13 +326,13 @@ class Config::SolrFake
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      config.add_sort_field 'score desc, pub_date_sort desc, title_sort asc', label: 'Relevancy'
-      config.add_sort_field 'pub_date_sort desc, title_sort    asc',          label: 'Date'
-      config.add_sort_field 'pub_date_sort desc, title_sort    desc',         label: 'Date (oldest first)'
-      config.add_sort_field 'title_sort    asc,  pub_date_sort desc',         label: 'Title'
-      config.add_sort_field 'title_sort    desc, pub_date_sort desc',         label: 'Title (reverse)'
-      config.add_sort_field 'author_sort   asc,  title_sort    asc',          label: 'Author'
-      config.add_sort_field 'author_sort   desc, title_sort    asc',          label: 'Author (reverse)'
+      config.add_sort_field :relevance,  sort: 'score desc, pub_date_sort desc, title_sort asc', label: 'Relevance'
+      config.add_sort_field :newest,     sort: 'pub_date_sort desc, title_sort    asc',          label: 'Date'
+      config.add_sort_field :oldest,     sort: 'pub_date_sort desc, title_sort    desc',         label: 'Date (oldest first)'
+      config.add_sort_field :title,      sort: 'title_sort    asc,  pub_date_sort desc',         label: 'Title'
+      config.add_sort_field :title_rev,  sort: 'title_sort    desc, pub_date_sort desc',         label: 'Title (reverse)'
+      config.add_sort_field :author,     sort: 'author_sort   asc,  title_sort    asc',          label: 'Author'
+      config.add_sort_field :author_rev, sort: 'author_sort   desc, title_sort    asc',          label: 'Author (reverse)'
 
       # === Blacklight behavior configuration ===
 

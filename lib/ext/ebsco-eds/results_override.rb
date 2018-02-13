@@ -137,7 +137,7 @@ override EBSCO::EDS::Results do
     # Facet-specific facet property params.
     ffparams = @raw_options.select { |k, _| k =~ /^f\.[^.]+\.facet\.[^.]+$/ }
     params.merge!(ffparams)
-    params.reject! { |_, v| v.blank? }
+    params.delete_if { |_, v| v.blank? }
 
     # Suggestions and corrections.
     spellcheck = solr_spellcheck.presence
@@ -361,7 +361,7 @@ override EBSCO::EDS::Results do
       when Array
         @facet_field_array = @facet_field
         @facet_field       = nil
-      when /^.*}([^}]+)$/
+      when /^.*}([^}]+)$/ # NOTE: 0% coverage for this case
         @facet_field_array = [@facet_field]
         @facet_field       = $1
       else
@@ -402,7 +402,7 @@ override EBSCO::EDS::Results do
     # If 'facet.page' was supplied instead of 'facet.offset', calculate the
     # implied offset.
     @facet_page = opt['facet.page'] || (opt['page'] if ff)
-    if @facet_page && !@facet_offset
+    if @facet_page && !@facet_offset # NOTE: 0% coverage for this case
       @facet_limit ||= 21
       @facet_offset = (@facet_page.to_i * @facet_limit.to_i) - 1
     end

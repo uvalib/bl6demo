@@ -407,8 +407,7 @@ module Blacklight::Solr
         url_params = url_params.except(*except) if except.present?
         solr_params.merge!(url_params.to_hash.with_indifferent_access)
       end
-      solr_params.reject! { |k, v| k.blank? || v.blank? }
-      solr_params
+      solr_params.delete_if { |k, v| k.blank? || v.blank? }
     end
 
   end

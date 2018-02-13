@@ -25,7 +25,7 @@ module Blacklight::Eds
     included do |base|
       __included(base, 'Blacklight::Eds::SuggestEds')
       include EdsConcern
-      include LensConcern
+      include Blacklight::SuggestExt
     end
 
     # =========================================================================
@@ -35,7 +35,6 @@ module Blacklight::Eds
     public
 
 =begin # NOTE: using base version
-=end
     # == GET /articles/suggest
     # Get search results from EBSCO EDS.
     #
@@ -47,6 +46,7 @@ module Blacklight::Eds
         format.json { render json: suggestions_service.suggestions }
       end
     end
+=end
 
     # =========================================================================
     # :section: Blacklight::Suggest replacements

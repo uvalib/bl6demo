@@ -305,58 +305,6 @@ module Blacklight
 =end
 
     # =========================================================================
-    # :section:
-    # =========================================================================
-
-    public
-
-=begin # TODO: discard if there's no apparent use for this
-    # title
-    #
-    # @param [Hash, nil] options
-    #
-    # @return [String, nil]
-    #
-    # Compare with:
-    # @see Blacklight::ShowPresenterExt#title
-    #
-    def title(options = nil)
-      opt = {
-        show_title:          true,
-        show_subtitle:       true,
-        show_linked_title:   true,
-        show_authors:        false,
-        show_linked_authors: false,
-      }
-      opt.merge!(options) if options.is_a?(Hash)
-      label(view_config.title_field, options)
-    end
-=end
-
-=begin # TODO: discard if there's no apparent use for this
-    # authors
-    #
-    # @param [Hash, nil] options
-    #
-    # @return [String, nil]
-    #
-    # Compare with:
-    # @see Blacklight::ShowPresenterExt#authors
-    #
-    def authors(options = nil)
-      opt = {
-        show_title:          false,
-        show_subtitle:       false,
-        show_linked_title:   false,
-        show_authors:        true,
-        show_linked_authors: true,
-      }
-      opt.merge!(options) if options.is_a?(Hash)
-      label(view_config.title_field, options)
-    end
-=end
-
-    # =========================================================================
     # :section: Blacklight::IndexPresenter overrides
     # =========================================================================
 

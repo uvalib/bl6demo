@@ -14,7 +14,6 @@ require 'blacklight/lens'
 module Blacklight::UrlHelperBehaviorExt
 
   include Blacklight::UrlHelperBehavior
-
   include LensHelper
 
   # ===========================================================================
@@ -121,7 +120,7 @@ module Blacklight::UrlHelperBehaviorExt
       link_to(label, url, opt)
     else
       opt[:class] += ' disabled'
-      opt[:title] = 'Already at the beginning of the list.' # TODO: I18n
+      opt[:title] = t('blacklight.search.pagination.at_beginning')
       content_tag(:span, label, opt)
     end
   end
@@ -147,7 +146,7 @@ module Blacklight::UrlHelperBehaviorExt
       link_to(label, url, opt)
     else # NOTE: 0% coverage for this case
       opt[:class] += ' disabled'
-      opt[:title] = 'Already at the end of the list.' # TODO: I18n
+      opt[:title] = t('blacklight.search.pagination.at_end')
       content_tag(:span, label, opt)
     end
   end

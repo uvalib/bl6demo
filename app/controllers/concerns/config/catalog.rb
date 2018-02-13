@@ -10,7 +10,7 @@ require_relative '_solr'
 
 module Config
 
-  CATALOG_CONFIG ||= Config::Solr.instance
+  CATALOG_CONFIG = Config::Solr.instance
 
   # Config::Catalog
   #

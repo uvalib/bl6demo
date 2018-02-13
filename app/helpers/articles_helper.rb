@@ -21,7 +21,7 @@ require 'blacklight/eds'
 #
 module ArticlesHelper
 
-  include Blacklight::Eds::BlacklightHelperEds
+  include Blacklight::BlacklightHelperBehaviorExt
 
   # ===========================================================================
   # :section:
@@ -98,6 +98,29 @@ module ArticlesHelper
         content_tag(:span, v, class: 'label label-default') if v.present?
       }.compact.join(separator).html_safe.presence
     result || (EBSCO_NO_LINK unless RETURN_NIL[__method__])
+  end
+
+  # eds_index_publication_info
+  #
+  # The `options[:value]` will be :eds_composed_title but if it's blank, show
+  # the :eds_publication_date instead.
+  #
+  # @param [Hash] options             Supplied by Blacklight::FieldPresenter.
+  #
+  # @return [ActiveSupport::SafeBuffer, nil]
+  #
+  # TODO: This never gets triggered if :eds_composed_title is missing...
+  # Maybe dealing with fields in this way needs to be handled through
+  # IndexPresenter.
+  #
+  def eds_index_publication_info(options = nil)
+    values, opt = extract_config_value(options)
+    separator = opt.delete(:separator) || "<br/>\n"
+    unless values.present?
+      doc = (options[:document] if options.respond_to?(:[]))
+      values = (doc[:eds_publication_date] if doc.is_a?(Blacklight::Document))
+    end
+    Array.wrap(values).join(separator).html_safe.presence
   end
 
   # best_fulltext
@@ -225,8 +248,8 @@ module ArticlesHelper
     values =
       case options
         when Hash  then options[:value]
-        when Array then options.map { |value| { url: value } }
-        else            { url: options.to_s }
+        when Array then options.map { |value| { url: value } } # NOTE: 0% coverage for this case
+        else            { url: options.to_s } # NOTE: 0% coverage for this case
       end
     types = types.presence
     links =
@@ -234,7 +257,7 @@ module ArticlesHelper
         next if hash.blank? || (types && !types.include?(hash['type']))
         make_eds_link(hash)
       }.compact
-    if links.blank?
+    if links.blank? # NOTE: 0% coverage for this case
       EBSCO_NO_LINK unless RETURN_NIL[__method__]
     elsif links.size == 1
       links.first

@@ -49,7 +49,8 @@ override EBSCO::EDS::SearchCriteria do
     #
     # 'range' => { 'pub_year_tisim' => { 'begin' => '1970', 'end' => '1980'} }
     #
-    if (year = options.dig('range', 'pub_year_tisim')).present? # NOTE: 0% coverage for this case
+    year = options.delete('range')&.fetch('pub_year_tisim', nil)
+    if year.present? # NOTE: 0% coverage for this case
       start_year = year['begin'].presence
       end_year   = year['end'].presence
       range = (start_year || end_year) && "#{start_year}-01/#{end_year}-01"
@@ -60,11 +61,14 @@ override EBSCO::EDS::SearchCriteria do
     # NOTE: the "search_field=advanced" case is not handled directly;
     # instead, individual search field queries are handled in the "else" clause
     # of the case statement below.
-    search_field = options.delete('search_field').to_s
+    search_field = options.delete('search_field').to_s.squish
     field_code =
-      EBSCO::EDS::SOLR_SEARCH_TO_EBSCO_FIELD_CODE[search_field] ||
-      (search_field if search_field =~ /[A-Z]{2}/)
-
+      if search_field =~ /^[A-Z]{2}$/ # NOTE: 0% coverage for this case
+        search_field
+      else
+        search_field = search_field.tr(' ', '_').underscore
+        EBSCO::EDS::SOLR_SEARCH_TO_EBSCO_FIELD_CODE[search_field]
+      end
     # Blacklight Advanced Search logical operator.
     logical_op = options.delete('op').to_s.upcase
     logical_op = nil unless %w(AND OR).include?(logical_op)
@@ -80,11 +84,10 @@ override EBSCO::EDS::SearchCriteria do
         # =====================================================================
 
         when 'q', 'query'
-          value = value.to_s
-          value = '*' if value.blank?
+          value = value.to_s.presence || '*'
           query = { Term: value }
-          query[:FieldCode]       = field_code unless field_code.nil?
-          query[:BooleanOperator] = logical_op unless logical_op.nil?
+          query[:FieldCode]       = field_code if field_code
+          query[:BooleanOperator] = logical_op if logical_op
           @Queries << query
 
         # =====================================================================
@@ -184,35 +187,37 @@ override EBSCO::EDS::SearchCriteria do
               case filter_query
                 when /^{!terms? (f[^=]*)=([^}]+)}(.+)$/
                   facet_type, facet_name, facet_values = $1, $2, $3
-                  facet_type   = facet_type.to_s.presence
-                  facet_name   = facet_name.to_s.sub(/ +tag=.*$/, '').presence
-                  facet_values = facet_values.to_s.split(',').presence
+                  facet_type = facet_type.to_s
+                  facet_name = facet_name.to_s.sub(/ +tag=.*$/, '')
+                  facet_values = facet_values.to_s.split(',')
                 when /^([^:]+):\((.*)\)$/
                   facet_name, facet_values = $1, $2
-                  facet_name   = facet_name.to_s.presence
-                  if (array = facet_values.to_s.split(/ +OR +/)).size > 1
-                    facet_type   = 'f_inclusive'
-                    facet_values = array
-                  elsif (array = facet_values.to_s.split(/ +AND +/)).size > 1
-                    facet_type   = 'f'
-                    facet_values = array
+                  facet_name = facet_name.to_s
+                  if (parts = facet_values.to_s.split(/ +OR +/)).size > 1 # NOTE: 0% coverage for this case
+                    facet_type = 'f_inclusive'
                   else
-                    facet_values = []
+                    parts = facet_values.to_s.split(/ +AND +/)
+                    facet_type = 'f'
                   end
-                  facet_values.map! { |v| v.sub(/^\\?"+(.*)\\?"+$/, '\1') }
-                  $stderr.puts ">>>>>>>>>>> values #{facet_values.inspect}"
+                  facet_values =
+                    parts.map { |v| v.sub(/^\\?"+(.*)\\?"+$/, '\1') }
               end
-              next unless facet_type && facet_name && facet_values.present?
-              ef = EBSCO::EDS::SOLR_FACET_TO_EBSCO_FACET[facet_name]
-              case facet_type
-                when 'f_inclusive'
-                  filter_id += 1
-                  facet_filter(filter_id, ef, facet_values)
-                when 'f'
-                  facet_values.map { |facet_value|
+              next unless facet_values.present?
+              if facet_name == 'eds_search_limiters_facet'
+                update_search_limiters(facet_values, info, logical_op)
+              elsif facet_name == 'eds_publication_year_range_facet' # NOTE: 0% coverage for this case
+                update_date_range_limiter(facet_values, info)
+              elsif (ef = EBSCO::EDS::SOLR_FACET_TO_EBSCO_FACET[facet_name])
+                case facet_type
+                  when 'f_inclusive' # NOTE: 0% coverage for this case
                     filter_id += 1
-                    facet_filter(filter_id, ef, facet_value)
-                  }
+                    facet_filter(filter_id, ef, facet_values)
+                  when 'f'
+                    facet_values.map { |facet_value|
+                      filter_id += 1
+                      facet_filter(filter_id, ef, facet_value)
+                    }
+                end
               end
             }.compact
 
@@ -220,7 +225,7 @@ override EBSCO::EDS::SearchCriteria do
         # Solr "inclusive-or" facets for Blacklight Advanced Search
         # =====================================================================
 
-        when 'f_inclusive'
+        when 'f_inclusive' # NOTE: 0% coverage for this case
           @FacetFilters +=
             EBSCO::EDS::SOLR_FACET_TO_EBSCO_FACET.map { |sf, ef|
               facet_values = Array.wrap(value[sf]).reject(&:blank?)
@@ -233,7 +238,7 @@ override EBSCO::EDS::SearchCriteria do
         # Solr "exclusive-or" facets and limiters
         # =====================================================================
 
-        when 'f'
+        when 'f' # NOTE: 0% coverage for this case
           @FacetFilters +=
             EBSCO::EDS::SOLR_FACET_TO_EBSCO_FACET.flat_map { |sf, ef|
               facet_values = Array.wrap(value[sf]).reject(&:blank?)
@@ -243,32 +248,11 @@ override EBSCO::EDS::SearchCriteria do
               }
             }
 
-          # Only handle 'select' limiters (ones with values of 'y' or 'n').
           values = Array.wrap(value['eds_search_limiters_facet'])
-          @Limiters +=
-            info.available_limiters.map { |limiter|
-              next unless limiter['Type'] == 'select'
-              id = limiter['Id']
-              if values.include?(id) || values.include?(limiter['Label'])
-                { Id: id, Values: ['y'] }
-              end
-            }.compact
+          update_search_limiters(values, info, logical_op) if values.present?
 
-          # Date limiters.
-          yy = Date.today.year
-          mm = Date.today.month
-          @Limiters +=
-            Array.wrap(value['eds_publication_year_range_facet']).map { |item| # NOTE: 0% coverage for this case
-              range =
-                case item.to_s.capitalize
-                  when 'This year'     then "#{yy}-01/#{yy}-#{mm}"
-                  when 'Last 3 years'  then "#{yy-3}-#{mm}/#{yy}-#{mm}"
-                  when 'Last 10 years' then "#{yy-10}-#{mm}/#{yy}-#{mm}"
-                  when 'Last 50 years' then "#{yy-50}-#{mm}/#{yy}-#{mm}"
-                  when 'More than 50 years ago' then "0000-01/#{yy-50}-12"
-                end
-              { Id: 'DT1', Values: [range] } if range.present?
-            }.compact
+          values = Array.wrap(value['eds_publication_year_range_facet'])
+          update_date_range_limiter(values, info) if values.present?
 
         # =====================================================================
         # Limiters
@@ -299,9 +283,9 @@ override EBSCO::EDS::SearchCriteria do
 
         else
           fc = EBSCO::EDS::SOLR_SEARCH_TO_EBSCO_FIELD_CODE[key]
-          if fc.present? && value.present?
+          if fc.present? && value.present? # NOTE: 0% coverage for this case
             query = { FieldCode: fc, Term: value.to_s }
-            query[:BooleanOperator] = logical_op unless logical_op.nil?
+            query[:BooleanOperator] = logical_op if logical_op
             @Queries << query
           else
             Rails.logger.debug {
@@ -315,7 +299,8 @@ override EBSCO::EDS::SearchCriteria do
 
     # Remove null search if it is not needed because other search terms were
     # introduced.
-    Queries << { Term: '*', BooleanOperator: logical_op } unless logical_op.nil?
+    @Queries << { Term: '*', BooleanOperator: logical_op } if logical_op
+    @Queries.uniq!
     non_null = @Queries.reject { |q| q[:Term] == '*' }
     @Queries = non_null unless non_null.empty?
 
@@ -354,6 +339,57 @@ override EBSCO::EDS::SearchCriteria do
     values = Array.wrap(values)
     values = values.map { |value| { Id: ebsco_facet, Value: value } }
     { FilterId: filter_id, FacetValues: values }
+  end
+
+  # Only handle 'select' limiters (ones with values of 'y' or 'n').
+  #
+  # @param [String, Array<String>] values
+  # @param [EBSCO::EDS::Info]      info
+  #
+  # @return [nil]
+  #
+  def update_search_limiters(values, info, logical_op = nil)
+    logical_op ||= 'AND'
+    limiters = info.available_limiters
+    @Limiters +=
+      Array.wrap(values).map { |value|
+        limiter =
+          limiters.find do |l|
+            (l['Type'] == 'select') && [l['Id'], l['Label']].include?(value)
+          end
+        next unless limiter
+        { Id: limiter['Id'], Values: ['y'] }.tap { |result|
+          result[:BooleanOperator] = logical_op if logical_op
+        }
+      }.compact
+    nil
+  end
+
+  # Date limiters.
+  #
+  # @param [String, Array<String>] values
+  # @param [EBSCO::EDS::Info]      info
+  #
+  # @return [nil]
+  #
+  # NOTE: 0% coverage for this method
+  #
+  def update_date_range_limiter(values, info)
+    yy = Date.today.year
+    mm = Date.today.month
+    @Limiters +=
+      Array.wrap(values).map { |value| # NOTE: 0% coverage for this case
+        range =
+          case value.to_s.capitalize
+            when 'This year'     then "#{yy}-01/#{yy}-#{mm}"
+            when 'Last 3 years'  then "#{yy-3}-#{mm}/#{yy}-#{mm}"
+            when 'Last 10 years' then "#{yy-10}-#{mm}/#{yy}-#{mm}"
+            when 'Last 50 years' then "#{yy-50}-#{mm}/#{yy}-#{mm}"
+            when 'More than 50 years ago' then "0000-01/#{yy-50}-12"
+          end
+        { Id: 'DT1', Values: [range] } if range.present?
+      }.compact
+    nil
   end
 
   # Convert hashes to ActiveSupport::HashWithIndifferentAccess.

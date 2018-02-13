@@ -12,8 +12,8 @@ require 'blacklight_advanced_search/_ext'
 #
 class ApplicationController < ActionController::Base
 
-  # Adds a few additional behaviors into the application controller
   include Blacklight::ControllerExt
+  include SessionConcern
 
   include Devise::Controllers::Helpers unless ONLY_FOR_DOCUMENTATION
 
@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
 
   add_flash_types :error, :success
 
-  layout 'blacklight'
+  layout 'application'
 
   # ===========================================================================
   # :section: Devise::Controllers::Helpers overrides
@@ -35,8 +35,6 @@ class ApplicationController < ActionController::Base
   #
   # This method overrides:
   # @see Devise::Controllers::Helpers#after_sign_in_path_for
-  #
-  # NOTE: 0% coverage for this method
   #
   def after_sign_in_path_for(*)
     session[:current_url].presence || root_path

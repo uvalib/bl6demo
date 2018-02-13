@@ -6,7 +6,7 @@ title ||= document.to_semantic_values[:title]&.first
 
 link = polymorphic_url(document, controller: current_lens_key)
 
-author = document.to_semantic_values[:author]&.first.presence
+author = document.to_semantic_values[:author]&.first&.presence
 
 xml.item do
   xml.title(title)

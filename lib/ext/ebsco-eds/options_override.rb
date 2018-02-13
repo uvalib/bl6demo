@@ -77,6 +77,8 @@ override EBSCO::EDS::Options do
   #
   # @example query-1=AND,volcano&sort=relevance&includefacets=y&searchmode=all&autosuggest=n&view=brief&resultsperpage=20&pagenumber=1&highlight=y
   #
+  # NOTE: 0% coverage for this method
+  #
   def to_query_string
 
     # SEARCH CRITERIA:

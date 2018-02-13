@@ -10,7 +10,7 @@ require_relative '_eds'
 
 module Config
 
-  ARTICLES_CONFIG ||= Config::Eds.instance
+  ARTICLES_CONFIG = Config::Eds.instance
 
   # Config::Articles
   #

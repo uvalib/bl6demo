@@ -49,7 +49,7 @@ module Blacklight
     # @return [ActiveSupport::SafeBuffer]
     #
     def content_tag(tag, value = nil, opt = nil)
-      if value.is_a?(Hash)
+      if value.is_a?(Hash) # NOTE: 0% coverage for this case
         opt   = value
         value = (yield if block_given?)
       end

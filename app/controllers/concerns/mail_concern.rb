@@ -73,7 +73,7 @@ module MailConcern
     ph_number = params[:to]
     if ph_number.blank?
       error << I18n.t('blacklight.sms.errors.to.blank')
-    elsif ph_number.gsub(/[^\d]/, '').length != 10 # NOTE: 0% coverage for this case
+    elsif ph_number.gsub(/[^\d]/, '').length != 10
       error << I18n.t('blacklight.sms.errors.to.invalid', to: ph_number)
     end
     carrier = params[:carrier]
@@ -82,7 +82,7 @@ module MailConcern
     elsif !sms_mappings.values.include?(carrier) # NOTE: 0% coverage for this case
       error << I18n.t('blacklight.sms.errors.carrier.invalid')
     end
-    flash[:error] = error.join("<br/>\n".html_safe) if error.present?
+    flash[:error] = error.join("<br/>\n").html_safe if error.present?
     flash[:error].blank?
   end
 
@@ -116,7 +116,7 @@ module MailConcern
     elsif !addr.match(Blacklight::Engine.config.email_regexp) # NOTE: 0% coverage for this case
       error << I18n.t('blacklight.email.errors.to.invalid', to: addr)
     end
-    flash[:error] = error.join("<br/>\n".html_safe) if error.present?
+    flash[:error] = error.join("<br/>\n").html_safe if error.present?
     flash[:error].blank?
   end
 

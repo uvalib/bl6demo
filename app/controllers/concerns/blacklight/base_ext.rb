@@ -27,7 +27,7 @@ module Blacklight::BaseExt
     __included(base, 'Blacklight::BaseExt')
     include RescueConcern
     include LensConcern
-=begin # NOTE: using base method
+=begin # NOTE: using base version
     # When Blacklight::Exceptions::InvalidRequest is raised, the
     # rsolr_request_error method is executed.
     # The index action will more than likely throw this one.

@@ -4,19 +4,23 @@
 # Settings not directly related to a specific Rails environment.
 # =============================================================================
 
+_solr:                                                                    &SOLR
+  adapter:      solr
+  http_adapter: httpclient
+
 # Production Solr instance (UVa on-Grounds or via VPN).
-_solr_prod_uva:                                               &SOLR_PROD_UVALIB
-  adapter: solr
+_solr_uva_prod:                                                  &SOLR_UVA_PROD
+  <<: *SOLR
   url: http://solr.lib.virginia.edu:8082/solr/core
 
 # Development Solr instance (UVa on-Grounds or via VPN).
-_solr_dev_uva:                                                 &SOLR_DEV_UVALIB
-  adapter: solr
+_solr_uva_dev:                                                    &SOLR_UVA_DEV
+  <<: *SOLR
   url: http://solrtest.lib.virginia.edu:8082/solr/core
 
 # Local development fake Solr instance.
 _solr_local:                                                        &SOLR_LOCAL
-  adapter: solr
+  <<: *SOLR
   url: <%=
     ENV['SOLR_URL'] ||
     "http://127.0.0.1:#{ENV['TEST_JETTY_PORT'] || 8983}/solr/blacklight-core"
@@ -27,16 +31,16 @@ _solr_local:                                                        &SOLR_LOCAL
 # =============================================================================
 
 # For the 'production' Rails environment (local).
-production:                                                         &PROD_LOCAL
-  <<: *SOLR_PROD_UVALIB
+production:                                                    &SOLR_LOCAL_PROD
+  <<: *SOLR_UVA_PROD
   #<<: *SOLR_LOCAL
 
 # For the 'development' Rails environment (local).
-development:                                                         &DEV_LOCAL
-  <<: *SOLR_PROD_UVALIB
+development:                                                    &SOLR_LOCAL_DEV
+  <<: *SOLR_UVA_PROD
   #<<: *SOLR_LOCAL
 
 # For the 'test' Rails environment (local).
-test:                                                               &TEST_LOCAL
-  <<: *SOLR_PROD_UVALIB
+test:                                                          &SOLR_LOCAL_TEST
+  <<: *SOLR_UVA_PROD
   #<<: *SOLR_LOCAL

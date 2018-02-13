@@ -48,6 +48,7 @@ module Blacklight::Eds
       end
 
       # TODO: testing...
+      # NOTE: 0% coverage for this method
       def self.default_catalog_controller
         ArticlesController
       end
@@ -79,10 +80,7 @@ module Blacklight::Eds
     end
 =end
 
-=begin # NOTE: using base version
-    # Take the user-entered query, and put it in the solr params,
-    # including config's "search field" params for current search field.
-    # also include setting spellcheck.q.
+    # Add simple or search term query.
     #
     # @param [Hash] solr_params
     #
@@ -91,55 +89,26 @@ module Blacklight::Eds
     # This method overrides:
     # @Blacklight::Solr::SearchBuilderBehavior#add_query_to_solr
     #
+    # TODO: This may be oversimplified...
+    #
     def add_query_to_solr(solr_params)
-
-      # Merge in search field configured values, if present, overriding
-      # general defaults.
-      #
-      # Legacy behavior of user param :qt is passed through, but overridden by
-      # the actual search field config if present. We might want to remove this
-      # legacy behavior at some point. It does not seem to be currently rspec'd.
-      #
-      qt = search_field&.qt.presence || blacklight_params[:qt].presence
-      solr_params[:qt] = qt if qt
-      solr_parameters = search_field&.solr_parameters.presence
-      solr_params.merge!(solr_parameters) if solr_parameters
-
-      # Create Solr 'q' including the user-entered q, prefixed by any Solr
-      # LocalParams in config, using Solr LocalParams syntax.
-      # @see http://wiki.apache.org/solr/LocalParams
-      #
-      solr_local_parameters = search_field&.solr_local_parameters.presence
-      q =
-        if solr_local_parameters
-          local_params =
-            solr_local_parameters.map { |key, val|
-              +"#{key}=" << solr_param_quote(val, quote: %q('))
-            }.join(' ')
-          "{!#{local_params}}#{blacklight_params[:q]}"
-        elsif q.is_a?(Hash)
-          solr_params[:spellcheck] = 'false'
-          terms =
-            if blacklight_params[:q].values.any?(&:blank?)
-              'NOT *:*' # If any field params are empty, exclude *all* results.
-            else
-              blacklight_params[:q].map { |field, values|
-                values = Array.wrap(values).map { |v| solr_param_quote(v) }
-                values = values.join(' OR ')
-                "#{field}:(#{values})"
-              }.join(' AND ')
-            end
-          "{!lucene}#{terms}"
-        end
-
-      if q
-        # Set Solr spellcheck.q to be original user-entered query, without our
-        # local params, otherwise it'll try and spellcheck the local params!
-        solr_params['spellcheck.q'] ||= q if solr_local_parameters
-        solr_params[:q] = q
+      sf = search_field
+      solr_params[:search_field] = sf.key if sf
+      q = blacklight_params[:q]
+      if q.is_a?(Hash)
+        q =
+          if q.values.any?(&:blank?)
+            'NOT *:*' # If any field params are empty, exclude *all* results.
+          else
+            q.map { |field, values|
+              values = Array.wrap(values).map { |v| solr_param_quote(v) }
+              values = values.join(' OR ')
+              "#{field}:(#{values})"
+            }.join(' AND ')
+          end
       end
+      solr_params[:q] = q if q.is_a?(String)
     end
-=end
 
 =begin # NOTE: using base version
     # Add any existing facet limits (present in the HTTP query as :f) to Solr
@@ -370,15 +339,15 @@ module Blacklight::Eds
     # in Solr request (no @response available), and used in display (with
     # @response available) to create a facet paginator with the right limit.
     #
-    # @param [String, Symbol] facet_field
+    # @param [String, Symbol] facet
     #
     # @param [Integer, nil]
     #
     # This method overrides:
     # @Blacklight::Solr::SearchBuilderBehavior#facet_limit_for
     #
-    def facet_limit_for(facet_field)
-      limit = blacklight_config.facet_fields[facet_field]&.limit
+    def facet_limit_for(facet)
+      limit = blacklight_config.facet_fields[facet.to_s]&.limit
       limit = blacklight_config.default_facet_limit if limit.is_a?(TrueClass)
       limit
     end
@@ -449,6 +418,7 @@ module Blacklight::Eds
     # @Blacklight::Solr::SearchBuilderBehavior#facet_value_to_fq_string
     #
     def facet_value_to_fq_string(facet_field, value)
+      facet_field  = facet_field.to_s
       facet_config = blacklight_config.facet_fields[facet_field]
       query = facet_config&.query
       if query

@@ -51,7 +51,7 @@ override EBSCO::EDS::RetrievalCriteria do
         # View
         # =====================================================================
 
-        when 'view'
+        when 'view' # NOTE: 0% coverage for this case
           value = value.to_s.downcase
           @View = (value if info.available_result_list_views.include?(value))
 
@@ -80,7 +80,7 @@ override EBSCO::EDS::RetrievalCriteria do
         # Highlight
         # =====================================================================
 
-        when 'highlight'
+        when 'highlight' # NOTE: 0% coverage for this case
           @Highlight = value.to_s
 
         when 'hl' # Solr/Blacklight version

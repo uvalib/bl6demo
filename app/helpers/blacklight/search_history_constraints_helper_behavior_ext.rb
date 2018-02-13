@@ -7,13 +7,14 @@ __loading_begin(__FILE__)
 
 require 'blacklight/lens'
 
-# Blacklight::UrlHelperBehaviorExt
+# Blacklight::SearchHistoryConstraintsHelperBehaviorExt
 #
-# @see Blacklight::UrlHelperBehavior
+# @see Blacklight::SearchHistoryConstraintsHelperBehavior
 #
 module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
 
   include Blacklight::SearchHistoryConstraintsHelperBehavior
+  include LensHelper
 
   # ===========================================================================
   # :section: Blacklight::SearchHistoryConstraintsHelperBehavior overrides
@@ -21,6 +22,7 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
 
   public
 
+=begin # NOTE: using base version
   # Simpler textual version of constraints, used on Search History page.
   # Theoretically can may be DRY'd up with results page render_constraints,
   # maybe even using the very same HTML with different CSS?
@@ -36,6 +38,7 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
   def render_search_to_s(params)
     render_search_to_s_q(params) + render_search_to_s_filters(params)
   end
+=end
 
   # Render the search query constraint.
   #
@@ -83,6 +86,7 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
     }.join("\n").html_safe
   end
 
+=begin # NOTE: using base version
   # render_search_to_s_element
   #
   # @param [Symbol, String]        key
@@ -103,7 +107,9 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
     display << content_tag(:span, value, class: 'filterValues')
     content_tag(:span, display, class: 'constraint')
   end
+=end
 
+=begin # NOTE: using base version
   # Render the name of the facet.
   #
   # @param [Symbol, String] name
@@ -118,7 +124,9 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
     display = t('blacklight.search.filters.label', label: name)
     content_tag(:span, display, class: 'filterName')
   end
+=end
 
+=begin # NOTE: using base version
   # Render the value of the facet.
   #
   # @param [String, Array<String>] value
@@ -133,6 +141,7 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
     display = key ? facet_display_value(key, value) : value
     content_tag(:span, h(display), class: 'filterValue')
   end
+=end
 
 end
 

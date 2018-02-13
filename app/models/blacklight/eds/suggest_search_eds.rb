@@ -46,7 +46,7 @@ module Blacklight::Eds
     # @param [Blacklight::Eds::Repository] repository
     #
     # This method overrides:
-    # @see Blacklight::SuggestSearchEds#initialize
+    # @see Blacklight::SuggestSearch#initialize
     #
     def initialize(params, repository)
       @request_params =
@@ -71,7 +71,7 @@ module Blacklight::Eds
     # @return [Blacklight::Eds::Suggest::ResponseEds]
     #
     # This method overrides:
-    # @see Blacklight::SuggestSearchEds#suggestions
+    # @see Blacklight::SuggestSearch#suggestions
     #
     def suggestions
       Blacklight::Eds::Suggest::ResponseEds.new(

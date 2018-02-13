@@ -85,6 +85,8 @@ module Blacklight::Eds::Response::FacetsEds
     # This method replaces:
     # @see Blacklight::Solr::Response::Facets::FacetField#limit
     #
+    # NOTE: 0% coverage for this method
+    #
     def limit
       @options[:limit]  || eds_default_limit
     end
@@ -95,6 +97,8 @@ module Blacklight::Eds::Response::FacetsEds
     #
     # This method replaces:
     # @see Blacklight::Solr::Response::Facets::FacetField#sort
+    #
+    # NOTE: 0% coverage for this method
     #
     def sort
       @options[:sort]   || eds_default_sort
@@ -107,6 +111,8 @@ module Blacklight::Eds::Response::FacetsEds
     # This method replaces:
     # @see Blacklight::Solr::Response::Facets::FacetField#offset
     #
+    # NOTE: 0% coverage for this method
+    #
     def offset
       @options[:offset] || eds_default_offset
     end
@@ -117,6 +123,8 @@ module Blacklight::Eds::Response::FacetsEds
     #
     # This method replaces:
     # @see Blacklight::Solr::Response::Facets::FacetField#prefix
+    #
+    # NOTE: 0% coverage for this method
     #
     def prefix
       @options[:prefix] || eds_default_prefix
@@ -158,6 +166,8 @@ module Blacklight::Eds::Response::FacetsEds
     # This method replaces:
     # @see Blacklight::Solr::Response::Facets::FacetField#solr_default_sort
     #
+    # NOTE: 0% coverage for this method
+    #
     def eds_default_sort
       solr_default_sort
     end
@@ -169,6 +179,8 @@ module Blacklight::Eds::Response::FacetsEds
     # This method replaces:
     # @see Blacklight::Solr::Response::Facets::FacetField#solr_default_offset
     #
+    # NOTE: 0% coverage for this method
+    #
     def eds_default_offset
       solr_default_offset
     end
@@ -179,6 +191,8 @@ module Blacklight::Eds::Response::FacetsEds
     #
     # This method replaces:
     # @see Blacklight::Solr::Response::Facets::FacetField#solr_default_prefix
+    #
+    # NOTE: 0% coverage for this method
     #
     def eds_default_prefix
       solr_default_prefix
@@ -452,3 +466,5 @@ module Blacklight::Eds::Response::FacetsEds
 =end
 
 end
+
+__loading_end(__FILE__)

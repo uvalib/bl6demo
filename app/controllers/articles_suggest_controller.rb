@@ -14,6 +14,7 @@ class ArticlesSuggestController < ApplicationController
 
   include ArticlesConcern
   include Blacklight::Eds::SuggestEds
+  include BlacklightAdvancedSearch::ControllerExt
 
   # ===========================================================================
   # :section:

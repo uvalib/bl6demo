@@ -88,7 +88,7 @@ module Blacklight::Eds
             # each *doc* into an array with these elements:
             # [0] all_score - terms with all matches to the top
             # [1] any_score - terms with most matches to the top
-            # [2] score     - tie-breaker sort by descending relevancy
+            # [2] score     - tie-breaker sort by descending relevance
             # [3..-1]       - fields with terms
             terms =
               doc.slice(*fields).values.flatten.map { |term|

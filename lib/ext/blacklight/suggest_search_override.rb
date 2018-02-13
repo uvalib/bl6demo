@@ -120,7 +120,7 @@ override Blacklight::Suggest::Response do
         # each *doc* into an array with these elements:
         # [0] all_score - terms with all matches to the top
         # [1] any_score - terms with most matches to the top
-        # [2] score     - tie-breaker sort by descending relevancy
+        # [2] score     - tie-breaker sort by descending relevance
         # [3..-1]       - fields with terms
         terms = doc.except('score').values.flatten.map(&:downcase)
         any = query.count { |qt| terms.any? { |term| term.include?(qt) } }

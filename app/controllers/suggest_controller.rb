@@ -12,6 +12,7 @@ require 'blacklight/lens'
 class SuggestController < ApplicationController
   include CatalogConcern
   include Blacklight::SuggestExt
+  include BlacklightAdvancedSearch::ControllerExt
 end
 
 __loading_end(__FILE__)

@@ -126,25 +126,28 @@ module Blacklight::Eds::CatalogEds
     end
   end
 
+=begin # NOTE: using base version
   # == POST /articles/:id/track
   # Updates the search counter (allows the show view to paginate).
   #
   # This method overrides:
   # @see Blacklight::CatalogExt#track
   #
-  def track # TODO: this *should* be handled by Blacklight::Catalog#track
+  def track
     search_session['counter']  = params[:counter]
     search_session['id']       = params[:search_id]
     search_session['per_page'] = params[:per_page]
     url                        = params[:redirect]
     path =
-      if url && (url.start_with?('/') || url =~ URI.regexp)
-        URI.parse(url).path
+      if url && (url.start_with?('/') || (url =~ URI.regexp))
+        uri = URI.parse(url)
+        uri.query ? "#{uri.path}?#{uri.query}" : uri.path
       else
         blacklight_config.document_model.new(id: params[:id])
       end
     redirect_to path, status: 303
   end
+=end
 
   # == GET /articles/facet/:id
   # Displays values and pagination links for a single facet field.
@@ -440,7 +443,7 @@ module Blacklight::Eds::CatalogEds
     elsif !sms_mappings.values.include?(carrier)
       error << I18n.t('blacklight.sms.errors.carrier.invalid')
     end
-    flash[:error] = error.join("<br/>\n".html_safe) if error.present?
+    flash[:error] = error.join("<br/>\n").html_safe if error.present?
     flash[:error].blank?
   end
 =end
@@ -474,7 +477,7 @@ module Blacklight::Eds::CatalogEds
     elsif !addr.match(Blacklight::Engine.config.email_regexp)
       error << I18n.t('blacklight.email.errors.to.invalid', to: addr)
     end
-    flash[:error] = error.join("<br/>\n".html_safe) if error.present?
+    flash[:error] = error.join("<br/>\n").html_safe if error.present?
     flash[:error].blank?
   end
 =end

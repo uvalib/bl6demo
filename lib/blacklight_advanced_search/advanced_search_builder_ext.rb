@@ -19,6 +19,7 @@ module BlacklightAdvancedSearch
   module AdvancedSearchBuilderExt # TODO: Remove if not needed
 
     include BlacklightAdvancedSearch::AdvancedSearchBuilder
+    include Blacklight::SearchFieldsExt
     include LensHelper
 
     # =========================================================================

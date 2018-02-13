@@ -34,6 +34,7 @@ module Blacklight::CatalogExt
 =begin # NOTE: using base version
     helper_method :sms_mappings, :has_search_parameters?
 =end
+    helper_method :has_query?
 
     helper Blacklight::FacetExt
 
@@ -116,6 +117,8 @@ module Blacklight::CatalogExt
     end
   end
 
+=begin # NOTE: using base version
+=end
   # == POST /catalog/:id/track
   # Updates the search counter (allows the show view to paginate).
   #
@@ -127,13 +130,13 @@ module Blacklight::CatalogExt
     search_session['id']       = params[:search_id]
     search_session['per_page'] = params[:per_page]
     url                        = params[:redirect]
-    if url && (url.start_with?('/') || url =~ URI.regexp)
-      uri = URI.parse(url)
-      path = uri.path
-      path += "?#{uri.query}" if uri.query.present?
-    else
-      path = blacklight_config.document_model.new(id: params[:id])
-    end
+    path =
+      if url && (url.start_with?('/') || (url =~ URI.regexp))
+        uri = URI.parse(url)
+        uri.query ? "#{uri.path}?#{uri.query}" : uri.path
+      else
+        blacklight_config.document_model.new(id: params[:id])
+      end
     redirect_to path, status: 303
   end
 
@@ -169,6 +172,8 @@ module Blacklight::CatalogExt
   #
   # This method overrides:
   # @see Blacklight::Catalog#opensearch
+  #
+  # NOTE: 0% coverage for this method
   #
   def opensearch
     respond_to do |format|
@@ -218,8 +223,24 @@ module Blacklight::CatalogExt
   # This method overrides:
   # @see Blacklight::Catalog#has_search_parameters?
   #
+  # NOTE: 0% coverage for this method
+  #
   def has_search_parameters?
-    %i(q search_field f f_inclusive).any? { |field| params[field].present? }
+    %i(q search_field f).any? { |field| params[field].present? }
+  end
+
+  # ===========================================================================
+  # :section:
+  # ===========================================================================
+
+  protected
+
+  # Indicate whether there has been a query issued by the user.
+  #
+  # NOTE: 0% coverage for this method
+  #
+  def has_query?
+    params[:q].present? && (params[:q] != '*')
   end
 
   # ===========================================================================
@@ -412,7 +433,7 @@ module Blacklight::CatalogExt
     elsif !sms_mappings.values.include?(carrier)
       error << I18n.t('blacklight.sms.errors.carrier.invalid')
     end
-    flash[:error] = error.join("<br/>\n".html_safe) if error.present?
+    flash[:error] = error.join("<br/>\n").html_safe if error.present?
     flash[:error].blank?
   end
 =end
@@ -446,7 +467,7 @@ module Blacklight::CatalogExt
     elsif !addr.match(Blacklight::Engine.config.email_regexp)
       error << I18n.t('blacklight.email.errors.to.invalid', to: addr)
     end
-    flash[:error] = error.join("<br/>\n".html_safe) if error.present?
+    flash[:error] = error.join("<br/>\n").html_safe if error.present?
     flash[:error].blank?
   end
 =end

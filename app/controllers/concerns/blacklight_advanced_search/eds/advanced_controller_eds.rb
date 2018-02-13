@@ -54,7 +54,6 @@ class BlacklightAdvancedSearch::Eds::AdvancedControllerEds < ArticlesController
   # TODO: Do a clean search to get total facet values THEN render to check boxes
   #
   def index
-    $stderr.puts '}}}}}}}}}}}}}}}}}}}}}}}} articles advanced index' # TODO: debugging - remove
     @response = get_advanced_search_facets unless request.method == :post
   end
 

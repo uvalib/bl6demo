@@ -10,14 +10,12 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require rails-ujs
-//= require turbolinks
+//= require 'rails-ujs'
+//= require 'turbolinks'
 //
 // Required by Blacklight
-//= require jquery
+//= require 'jquery'
+//= require 'blacklight/blacklight'
 //= require 'blacklight_advanced_search'
-
-
-//= require blacklight/blacklight
 
 //= require_tree .

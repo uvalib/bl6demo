@@ -37,6 +37,8 @@ module Blacklight::ControllerExt
     include Blacklight::SearchFields
     helper Blacklight::SearchFields
 =end
+    include Blacklight::SearchFieldsExt
+    helper  Blacklight::SearchFieldsExt
 =begin # NOTE: using base version
     include ActiveSupport::Callbacks
 =end

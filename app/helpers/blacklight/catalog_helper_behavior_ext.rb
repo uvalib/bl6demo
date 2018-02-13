@@ -198,8 +198,7 @@ module Blacklight::CatalogHelperBehaviorExt
   end
 =end
 
-=begin # NOTE: using base version
-  # Look up the current sort field, or provide the default if none is set
+  # Look up the current sort field, or provide the default if none is set.
   #
   # @return [Blacklight::Configuration::SortField]
   #
@@ -207,13 +206,15 @@ module Blacklight::CatalogHelperBehaviorExt
   # @see Blacklight::CatalogHelperBehavior#current_sort_field
   #
   def current_sort_field
-    sort = @response&.sort.presence
+    entry = nil
     sort_fields = blacklight_config.sort_fields
-    (sort_fields.values.find { |f| f.sort == sort } if sort) ||
-      sort_fields[params[:sort]] ||
-      default_sort_field
+    [@response&.sort, params[:sort]].find { |sort|
+      next if sort.blank?
+      entry = sort_fields.find { |k, f| (k == sort) || (f.sort == sort) }
+    }
+    entry ||= sort_fields.first
+    entry.last
   end
-=end
 
 =begin # NOTE: using base version
   # Look up the current per page value, or the default if none if set.
@@ -241,7 +242,7 @@ module Blacklight::CatalogHelperBehaviorExt
   def render_document_class(doc = nil)
     doc ||= @document
     config = doc && blacklight_config(doc)
-    field  = config&.view_config(document_index_view_type).display_type_field
+    field  = config&.view_config(document_index_view_type)&.display_type_field
     types  = field && Array.wrap(doc[field])
     return unless types.present?
     types.map { |type|
@@ -364,7 +365,7 @@ module Blacklight::CatalogHelperBehaviorExt
   def render_thumbnail_tag(doc = nil, image_opt = nil, url_opt = nil)
     doc ||= @document
     return unless doc.is_a?(Blacklight::Document)
-    if url_opt.is_a?(FalseClass)
+    if url_opt.is_a?(FalseClass) # NOTE: 0% coverage for this case
       Deprecation.warn(self,
         'passing false as the second argument to render_thumbnail_tag is ' \
         'deprecated. Use suppress_link: true instead. This behavior will ' \
@@ -374,7 +375,7 @@ module Blacklight::CatalogHelperBehaviorExt
     end
     view_config = blacklight_config(doc).view_config(document_index_view_type)
     value =
-      if view_config.thumbnail_method
+      if view_config.thumbnail_method # NOTE: 0% coverage for this case
         send(view_config.thumbnail_method, doc, image_opt)
       elsif (url = thumbnail_url(doc))
         image_tag(url, image_opt)
@@ -512,7 +513,7 @@ module Blacklight::CatalogHelperBehaviorExt
     constraints = []
     if q.present?
       label =
-        unless default_search_field && (sf == default_search_field[:key])
+        unless sf == default_search_field.key)
           label_for_search_field(sf)
         end
       constraints <<
@@ -586,6 +587,8 @@ module Blacklight::CatalogHelperBehaviorExt
   # @param [Hash, nil] options
   #
   # @return [ActiveSupport::SafeBuffer]
+  #
+  # NOTE: 0% coverage for this method
   #
   def atom_button(options = nil)
     opt = { class: 'atom-link', title: 'Atom' }

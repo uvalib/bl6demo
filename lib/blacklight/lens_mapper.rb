@@ -45,10 +45,9 @@ module Blacklight
     def key_for(name)
       case name
         when nil                    then default_key
-        when Array                  then key_for(name.first)
-        #when Symbol                 then key_for_name(name)
-        when Config::Base           then name.key
-        when Blacklight::Lens       then name.key
+        when Array                  then key_for(name.first) # NOTE: 0% coverage for this case
+        when Config::Base           then name.key # NOTE: 0% coverage for this case
+        when Blacklight::Lens       then name.key # NOTE: 0% coverage for this case
         when Blacklight::Document   then key_for_doc(name)
         when Blacklight::Controller then key_for_name(name.class)
         else                             key_for_name(name)

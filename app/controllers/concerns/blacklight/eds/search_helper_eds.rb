@@ -13,6 +13,10 @@ require 'blacklight/eds'
 # @see Blacklight::SearchHelperExt
 # @see Blacklight::SearchHelper
 #
+# === Implementation Notes
+# The SearchHelper overrides in this module are essentially a pass-through for:
+# @see Blacklight::Eds::SearchService
+#
 module Blacklight::Eds::SearchHelperEds
 
   extend ActiveSupport::Concern
@@ -134,8 +138,6 @@ module Blacklight::Eds::SearchHelperEds
   #
   # Compare with:
   # @see Blacklight::Eds::SearchService#get_facet_field_response
-  #
-  # NOTE: 0% coverage for this method
   #
   def get_facet_field_response(facet_field, req_params = nil, eds_params = nil)
     search_service.get_facet_field_response(

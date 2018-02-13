@@ -14,11 +14,21 @@
         font-size:       xx-large;
         font-weight:     bold;
         font-variant:    small-caps;
+        color:           whitesmoke;
 
         // Make the current lens less prominent than the application name.
         .navbar-lens {
             font-size:    smaller;
             font-variant: none;
+        }
+
+        a {
+            color: inherit;
+
+            &:hover {
+                color:           #337ab7;
+                text-decoration: none;
+            }
         }
     }
 }

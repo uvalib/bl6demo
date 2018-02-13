@@ -26,6 +26,7 @@ module Blacklight
     # Code to be added to the controller class including this module.
     included do |base|
       __included(base, 'Blacklight::SuggestExt')
+      include SuggestHelper
       include Blacklight::SearchHelperExt
       include LensConcern
     end

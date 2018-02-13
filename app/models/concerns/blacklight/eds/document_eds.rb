@@ -141,6 +141,8 @@ xend
   # Compare with:
   # @see Blacklight::Solr::Document::MarcExport#export_as_xml
   #
+  # NOTE: 0% coverage for this method
+  #
   def export_as_xml
     super # TODO: XML export for non-MARC
   end
@@ -216,6 +218,8 @@ xend
   # Compare with:
   # @see Blacklight::Solr::Document::MarcExport#export_as_refworks_marc_txt
   #
+  # NOTE: 0% coverage for this method
+  #
   def export_as_refworks_marc_txt
     super # TODO - RefWorks for non-MARC
   end
@@ -240,6 +244,8 @@ xend
   #
   # This method overrides:
   # @see Blacklight::Document::ExportExt#export_as_ris
+  #
+  # NOTE: 0% coverage for this method
   #
   def export_as_ris
     super # TODO - Zotero RIS for non-MARC

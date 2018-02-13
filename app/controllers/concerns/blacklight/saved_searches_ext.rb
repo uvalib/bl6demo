@@ -66,7 +66,7 @@ module Blacklight
       current_user.searches << searches_from_history.find(params[:id])
       if current_user.save
         go_back notice: I18n.t('blacklight.saved_searches.add.success')
-      else
+      else # NOTE: 0% coverage for this case
         go_back error:  I18n.t('blacklight.saved_searches.add.failure')
       end
     end
@@ -85,7 +85,7 @@ module Blacklight
         search.user_id = nil
         search.save
         go_back notice: I18n.t('blacklight.saved_searches.remove.success')
-      else
+      else # NOTE: 0% coverage for this case
         go_back error:  I18n.t('blacklight.saved_searches.remove.failure')
       end
     end
@@ -97,12 +97,10 @@ module Blacklight
     # This method replaces:
     # @see Blacklight::SavedSearches#clear
     #
-    # NOTE: 0% coverage for this method
-    #
     def clear
       if current_user.searches.update_all('user_id = NULL')
         flash[:notice] = I18n.t('blacklight.saved_searches.clear.success')
-      else
+      else # NOTE: 0% coverage for this case
         flash[:error]  = I18n.t('blacklight.saved_searches.clear.failure')
       end
       redirect_to blacklight.saved_searches_url

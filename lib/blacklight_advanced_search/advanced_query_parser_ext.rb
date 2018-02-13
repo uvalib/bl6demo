@@ -80,7 +80,7 @@ module BlacklightAdvancedSearch
     # Extracts advanced-type keyword query elements from query params,
     # returns as a hash of field => query.
     #
-    # @return [Hash]
+    # @return [Hash{Symbol=>String}]
     #
     # @see self#keyword_op
     #
@@ -90,9 +90,9 @@ module BlacklightAdvancedSearch
     def keyword_queries
       @keyword_queries ||=
         if @params[:search_field] == config.advanced_search[:url_key]
-          config.search_fields.map { |key, _field_def|
-            key = key.to_sym
-            [key, @params[key]] if @params[key]
+          config.search_fields.keys.map { |key|
+            query = @params[key].presence
+            [key, query] if query
           }.compact.to_h
         else
           {}

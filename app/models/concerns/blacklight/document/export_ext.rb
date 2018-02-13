@@ -249,6 +249,8 @@ module Blacklight::Document::ExportExt
   # Compare with:
   # @see Blacklight::Solr::Document::MarcExport#export_as_marc
   #
+  # NOTE: 0% coverage for this method
+  #
   def export_as_marc
     if to_marc
       not_implemented('MARC')
@@ -265,6 +267,8 @@ module Blacklight::Document::ExportExt
   # Compare with:
   # @see Blacklight::Solr::Document::MarcExport#export_as_marcxml
   #
+  # NOTE: 0% coverage for this method
+  #
   def export_as_marcxml
     if to_marc
       not_implemented('MARCXML')
@@ -280,6 +284,8 @@ module Blacklight::Document::ExportExt
   #
   # Compare with:
   # @see Blacklight::Solr::Document::MarcExport#export_as_xml
+  #
+  # NOTE: 0% coverage for this method
   #
   def export_as_xml
     not_implemented('XML')
@@ -343,6 +349,8 @@ module Blacklight::Document::ExportExt
   # Compare with:
   # @see Blacklight::Solr::Document::MarcExport#export_as_refworks_marc_txt
   #
+  # NOTE: 0% coverage for this method
+  #
   def export_as_refworks_marc_txt
     not_implemented('RefWorks')
   end
@@ -369,6 +377,8 @@ module Blacklight::Document::ExportExt
   #
   # @return [String]
   # @return [nil]
+  #
+  # NOTE: 0% coverage for this method
   #
   def export_as_ris
     not_implemented('Zotero RIS')
@@ -417,6 +427,8 @@ module Blacklight::Document::ExportExt
   # @param [Symbol, nil] method
   #
   # @raise [NotImplementedError]
+  #
+  # NOTE: 0% coverage for this method
   #
   def invalid_for_non_marc(method = nil)
     report = +'ERROR: '

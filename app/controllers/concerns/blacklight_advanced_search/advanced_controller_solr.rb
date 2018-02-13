@@ -49,7 +49,6 @@ class BlacklightAdvancedSearch::AdvancedControllerSolr < CatalogController
   # @see BlacklightAdvancedSearch::AdvancedController#index
   #
   def index
-    $stderr.puts '}}}}}}}}}}}}}}}}}}}}}}}} catalog advanced index' # TODO: debugging - remove
     @response = get_advanced_search_facets unless request.method == :post
   end
 

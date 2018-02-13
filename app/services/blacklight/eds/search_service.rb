@@ -124,8 +124,6 @@ module Blacklight::Eds
     # Compare with:
     # @see Blacklight::SearchHelper#get_facet_field_response
     #
-    # NOTE: 0% coverage for this method
-    #
     def get_facet_field_response(facet_field, req_params = nil, eds_params = nil)
       query =
         search_builder
@@ -260,19 +258,33 @@ module Blacklight::Eds
     #
     # @return [Array<(Blacklight::Solr::Response, Array<EdsDocument>)>]
     #
-    # Compare with:
-    # @see Blacklight::SearchHelper#fetch_many
+    # Compare with (for catalog search):
+    # @see Blacklight::SearchHelperExt#fetch_many
     #
     def fetch_many(ids, req_params = nil, eds_params = nil)
-      query =
-        search_builder
-          .with(@user_params)
-          .where(@blacklight_config.document_model.unique_key => ids)
-          .merge(fl: '*')
-          .merge(req_params  || {})
-      eds_params = @eds_params.merge(eds_params || {})
-      response   = @repository.search(query, eds_params)
-      return response, response.documents
+
+      # Get each item from its appropriate repository one-at-a-time rather than
+      # as a batch (search) request.  This is for two reasons:
+      # 1. Ensure that each failed item is indicated with a *nil* value.
+      # 2. To better support cache management.
+      response_hash = {}
+      response_docs = {}
+      Array.wrap(ids).each do |id|
+        next if response_hash[id] && response_docs[id]
+        response, document = fetch_one(id, eds_params)
+        response &&= response['response']
+        response &&= response['doc'] || response['docs']
+        response_hash[id] = Array.wrap(response).first || document&.to_h
+        response_docs[id] = document
+      end
+
+      # Manufacture a response from the sets of document hash values.
+      response_params = Blacklight::Parameters.sanitize(req_params)
+      response = Blacklight::Eds::Response.new({}, response_params)
+      response['response'] ||= {}
+      response['response']['docs'] = response_hash.values
+      return response, response_docs.values
+
     end
 
     # fetch_one
@@ -282,8 +294,8 @@ module Blacklight::Eds
     #
     # @return [Array<(Blacklight::Solr::Response, EdsDocument)>]
     #
-    # Compare with:
-    # @see Blacklight::SearchHelper#fetch_one
+    # Compare with (for catalog search):
+    # @see Blacklight::SearchHelperExt#fetch_one
     #
     def fetch_one(id, eds_params = nil)
       eds_params = @eds_params.merge(eds_params || {})

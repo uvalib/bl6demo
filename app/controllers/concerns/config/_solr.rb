@@ -40,7 +40,7 @@ class Config::Solr
   BY_TITLE       = :title_sort_facet
   BY_AUTHOR      = :author_sort_facet
   BY_CALL_NUMBER = :call_number_sort_facet
-  BY_RELEVANCE   = :score
+  BY_SCORE       = :score
 
   BY_RECEIVED_DATE   = "#{BY_RECEIPT} desc"
   BY_NEWEST          = "#{BY_YEAR} desc, #{BY_RECEIPT} desc"
@@ -49,7 +49,7 @@ class Config::Solr
   IN_AUTHOR_ORDER    = "#{BY_AUTHOR} asc, #{BY_TITLE} asc"
   IN_SHELF_ORDER     = "#{BY_CALL_NUMBER} asc"
   IN_REV_SHELF_ORDER = "#{BY_CALL_NUMBER} desc"
-  BY_RELEVANCY       = "#{BY_RELEVANCE} desc, #{BY_NEWEST}"
+  BY_RELEVANCE       = "#{BY_SCORE} desc, #{BY_NEWEST}"
 
   # ===========================================================================
   # :section:
@@ -279,7 +279,9 @@ class Config::Solr
       #
       config.facet_fields.each_pair do |key, field_def|
 
-        case key.to_sym
+        key = key.to_sym
+
+        case key
           when :library_facet            then -1 # Show all libraries.
           when :author_facet             then 10
           when :series_title_facet       then 15
@@ -288,13 +290,13 @@ class Config::Solr
           else                                20
         end.tap { |limit| field_def.limit = limit if limit }
 
-        case key.to_sym
+        case key
           when :library_facet            then 'index'
           when :call_number_broad_facet  then 'index'
           else                                'count'
         end.tap { |sort| field_def.sort = sort if sort }
 
-        case key.to_sym
+        case key
           when :alternate_form_title_facet  then "\x20".."\x7E"
           when :author_facet                then "\x20".."\x7E"
           when :genre_facet                 then "\x20".."\x7E"
@@ -330,9 +332,9 @@ class Config::Solr
       #config.add_index_field :title_display,           label: 'Title'
       #config.add_index_field :subtitle_display,        label: 'Subtitle'
       #config.add_index_field :linked_title_display,    label: 'Title'
+      config.add_index_field :format_facet,             label: 'Format',            helper_method: :format_facet_label
       config.add_index_field :linked_author_display,    label: 'Author'
       config.add_index_field :author_display,           label: 'Author'
-      config.add_index_field :format_facet,             label: 'Format',            helper_method: :format_facet_label
       config.add_index_field :language_facet,           label: 'Language'
       config.add_index_field :year_display,             label: 'Date'
       config.add_index_field :published_date_display,   label: 'Published'
@@ -503,47 +505,79 @@ class Config::Solr
 
       # "Title" search selection.
       config.add_search_field(:title) do |field|
-        #field.solr_parameters = { 'spellcheck.dictionary': 'title' } # TODO: ?
-        field.solr_local_parameters = { qf: '$qf_title', pf: '$pf_title' }
+        field.solr_local_parameters = {
+          #'spellcheck.dictionary': 'title', # TODO: ?
+          #qf: '${qf_title}', # TODO: Solr 7.x
+          #pf: '${pf_title}', # TODO: Solr 7.x
+          qf: '$qf_title',
+          pf: '$pf_title',
+        }
       end
 
       # "Author" search selection.
       config.add_search_field(:author) do |field|
-        #field.solr_parameters = { 'spellcheck.dictionary': 'author' } # TODO: ?
-        field.solr_local_parameters = { qf: '$qf_author', pf: '$pf_author' }
+        field.solr_local_parameters = {
+          #'spellcheck.dictionary': 'author', # TODO: ?
+          #qf: '${qf_author}', # TODO: Solr 7.x
+          #pf: '${pf_author}', # TODO: Solr 7.x
+          qf: '$qf_author',
+          pf: '$pf_author',
+        }
       end
 
       # "Subject" search selection.
       config.add_search_field(:subject) do |field|
-        #field.solr_parameters = { 'spellcheck.dictionary': 'subject' } # TODO: ?
-        field.solr_local_parameters = { qf: '$qf_subject', pf: '$pf_subject' }
+        field.solr_local_parameters = {
+          #'spellcheck.dictionary': 'subject', # TODO: ?
+          #qf: '${qf_subject}', # TODO: Solr 7.x
+          #pf: '${pf_subject}', # TODO: Solr 7.x
+          qf: '$qf_subject',
+          pf: '$pf_subject',
+        }
       end
 
       # "Journal Title" search selection.
       config.add_search_field(:journal) do |field|
         field.label = 'Journal Title'
-        field.solr_local_parameters =
-          { qf: '$qf_journal_title', pf: '$pf_journal_title' }
+        field.solr_local_parameters = {
+          #qf: '${qf_journal_title}', # TODO: Solr 7.x
+          #pf: '${pf_journal_title}', # TODO: Solr 7.x
+          qf: '$qf_journal_title',
+          pf: '$pf_journal_title',
+        }
       end
 
       # "Keywords" search selection. # TODO: testing?
       config.add_search_field(:keyword) do |field|
         field.label = 'Keywords'
-        field.solr_local_parameters = { qf: '$qf_keyword', pf: '$pf_keyword' }
+        field.solr_local_parameters = {
+          #qf: '${qf_keyword}', # TODO: Solr 7.x
+          #pf: '${pf_keyword}', # TODO: Solr 7.x
+          qf: '$qf_keyword',
+          pf: '$pf_keyword',
+        }
       end
 
       # "Call Number" search selection. # TODO: testing?
       config.add_search_field(:call_number) do |field|
         field.label = 'Call Number'
-        field.solr_local_parameters =
-          { qf: '$qf_call_number', pf: '$pf_call_number' }
+        field.solr_local_parameters = {
+          #qf: '${qf_call_number}', # TODO: Solr 7.x
+          #pf: '${pf_call_number}', # TODO: Solr 7.x
+          qf: '$qf_call_number',
+          pf: '$pf_call_number',
+        }
       end
 
       # "Publisher" search selection. # TODO: testing?
       config.add_search_field(:published) do |field|
         field.label = 'Publisher Name/Place'
-        field.solr_local_parameters =
-          { qf: '$qf_published', pf: '$pf_published' }
+        field.solr_local_parameters = {
+          #qf: '${qf_published}', # TODO: Solr 7.x
+          #pf: '${pf_published}', # TODO: Solr 7.x
+          qf: '$qf_published',
+          pf: '$pf_published',
+        }
       end
 
       # "Publisher" search selection. # TODO: testing?
@@ -556,18 +590,28 @@ class Config::Solr
       # "ISSN" search selection. # TODO: testing?
       config.add_search_field(:issn) do |field|
         field.label = 'ISSN'
-        field.solr_local_parameters = { qf: '$qf_issn', pf: '$pf_issn' }
+        field.solr_local_parameters = {
+          #qf: '${qf_issn}', # TODO: Solr 7.x
+          #pf: '${pf_issn}', # TODO: Solr 7.x
+          qf: '$qf_issn',
+          pf: '$pf_issn',
+        }
 =begin
-      field.include_in_advanced_search = false
+        field.include_in_advanced_search = false
 =end
       end
 
       # "ISBN" search selection. # TODO: testing?
       config.add_search_field(:isbn) do |field|
         field.label = 'ISBN'
-        field.solr_local_parameters = { qf: '$qf_isbn', pf: '$pf_isbn' }
+        field.solr_local_parameters = {
+          #qf: '${qf_isbn}', # TODO: Solr 7.x
+          #pf: '${pf_isbn}', # TODO: Solr 7.x
+          qf: '$qf_isbn',
+          pf: '$pf_isbn',
+        }
 =begin
-      field.include_in_advanced_search = false
+        field.include_in_advanced_search = false
 =end
       end
 
@@ -584,14 +628,14 @@ class Config::Solr
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      config.add_sort_field BY_RELEVANCY,       label: 'Relevancy'
-      config.add_sort_field BY_RECEIVED_DATE,   label: 'Date Received'
-      config.add_sort_field BY_NEWEST,          label: 'Date Published (newest)'
-      config.add_sort_field BY_OLDEST,          label: 'Date Published (oldest)'
-      config.add_sort_field IN_TITLE_ORDER,     label: 'Title'
-      config.add_sort_field IN_AUTHOR_ORDER,    label: 'Author'
-      config.add_sort_field IN_SHELF_ORDER,     label: 'Call Number'
-      config.add_sort_field IN_REV_SHELF_ORDER, label: 'Call Number (reverse)'
+      config.add_sort_field :relevance,       sort: BY_RELEVANCE,       label: 'Relevance'
+      config.add_sort_field :received,        sort: BY_RECEIVED_DATE,   label: 'Date Received'
+      config.add_sort_field :newest,          sort: BY_NEWEST,          label: 'Date Published (newest)'
+      config.add_sort_field :oldest,          sort: BY_OLDEST,          label: 'Date Published (oldest)'
+      config.add_sort_field :title,           sort: IN_TITLE_ORDER,     label: 'Title'
+      config.add_sort_field :author,          sort: IN_AUTHOR_ORDER,    label: 'Author'
+      config.add_sort_field :call_number,     sort: IN_SHELF_ORDER,     label: 'Call Number'
+      config.add_sort_field :call_number_rev, sort: IN_REV_SHELF_ORDER, label: 'Call Number (reverse)'
 
       # === Blacklight behavior configuration ===
 

@@ -61,14 +61,9 @@ override EBSCO::EDS::SearchCriteria do
     # NOTE: the "search_field=advanced" case is not handled directly;
     # instead, individual search field queries are handled in the "else" clause
     # of the case statement below.
-    search_field = options.delete('search_field').to_s.squish
-    field_code =
-      if search_field =~ /^[A-Z]{2}$/ # NOTE: 0% coverage for this case
-        search_field
-      else
-        search_field = search_field.tr(' ', '_').underscore
-        EBSCO::EDS::SOLR_SEARCH_TO_EBSCO_FIELD_CODE[search_field]
-      end
+    search_field = options.delete('search_field')
+    field_code   = get_field_code(search_field)
+
     # Blacklight Advanced Search logical operator.
     logical_op = options.delete('op').to_s.upcase
     logical_op = nil unless %w(AND OR).include?(logical_op)
@@ -84,11 +79,28 @@ override EBSCO::EDS::SearchCriteria do
         # =====================================================================
 
         when 'q', 'query'
-          value = value.to_s.presence || '*'
-          query = { Term: value }
-          query[:FieldCode]       = field_code if field_code
-          query[:BooleanOperator] = logical_op if logical_op
-          @Queries << query
+          value = value.to_s.squish
+          if value.include?('_query_:')
+            # Solr dismax syntax (from Blacklight Advanced Search).
+            queries, search_mode = parse_query(value)
+            @SearchMode = search_mode if search_mode
+            @Queries += queries
+          elsif value.include?('{!')
+            # Search field query (modified by Blacklight Advanced Search).
+            value = value.sub(/^{!qf=([^}]*)}/, '')
+            fc    = get_field_code($1) || field_code
+            query = { Term: value }
+            query[:FieldCode]       = fc         if fc
+            query[:BooleanOperator] = logical_op if logical_op
+            @Queries << query
+          else
+            # Plain query.
+            value = '*' if value.blank?
+            query = { Term: value }
+            query[:FieldCode]       = field_code if field_code
+            query[:BooleanOperator] = logical_op if logical_op
+            @Queries << query
+          end
 
         # =====================================================================
         # Mode
@@ -182,7 +194,6 @@ override EBSCO::EDS::SearchCriteria do
         when 'fq'
           @FacetFilters +=
             Array.wrap(value).flat_map { |filter_query|
-              $stderr.puts ">>>>>>>>>>> filter_query #{filter_query.inspect}"
               facet_type = facet_name = facet_values = nil
               case filter_query
                 when /^{!terms? (f[^=]*)=([^}]+)}(.+)$/
@@ -238,7 +249,7 @@ override EBSCO::EDS::SearchCriteria do
         # Solr "exclusive-or" facets and limiters
         # =====================================================================
 
-        when 'f' # NOTE: 0% coverage for this case
+        when 'f'
           @FacetFilters +=
             EBSCO::EDS::SOLR_FACET_TO_EBSCO_FACET.flat_map { |sf, ef|
               facet_values = Array.wrap(value[sf]).reject(&:blank?)
@@ -282,8 +293,7 @@ override EBSCO::EDS::SearchCriteria do
         # =====================================================================
 
         else
-          fc = EBSCO::EDS::SOLR_SEARCH_TO_EBSCO_FIELD_CODE[key]
-          if fc.present? && value.present? # NOTE: 0% coverage for this case
+          if value.present? && (fc = get_field_code(key)) # NOTE: 0% coverage for this case
             query = { FieldCode: fc, Term: value.to_s }
             query[:BooleanOperator] = logical_op if logical_op
             @Queries << query
@@ -326,6 +336,46 @@ override EBSCO::EDS::SearchCriteria do
   # ===========================================================================
 
   private
+
+  # parse_query
+  #
+  # @param [String] q
+  #
+  # @return [Array<(Array<Hash>,String)]
+  #
+  # === Implementation Notes
+  # This makes use of the fact that Blacklight Advanced Search has already
+  # parsed the original query into a tree so parenthesis nesting and logical
+  # operators (where the exist) are preserved.  This method simply transforms
+  # '_query:"{!dismax...}..."' terms into a form that can be used by EDS.
+  #
+  # Parentheses will have been removed from the input search terms, so any
+  # parentheses in found in *q* represent grouping of logical terms.
+  #
+  # TODO: still doesn't handle parentheses properly.
+  #
+  def parse_query(q)
+    queries = []
+    count = -1
+    mode = nil
+    outline =
+      q.gsub(/_query_:"{!dismax *(qf=\w+)? *(mm=1)?}([^"]+)" *(AND|OR)?/) do
+        mode =
+          case $4
+            when 'OR'  then 'any'
+            when 'AND' then 'all'
+          end
+        query = { Term: $3.to_s.squish }
+        query[:BooleanOperator] = 'OR' if $2 == 'mm=1'
+        search_field = $1.to_s.strip.sub!(/^qf=/, '')
+        field_code   = get_field_code(search_field)
+        query[:FieldCode] = field_code if field_code.present?
+        queries << query
+        "#{count+=1}"
+      end
+    mode ||= outline.include?('OR') ? 'any' : 'all'
+    return queries, mode
+  end
 
   # Create an entry for @FacetFilters.
   #
@@ -390,6 +440,22 @@ override EBSCO::EDS::SearchCriteria do
         { Id: 'DT1', Values: [range] } if range.present?
       }.compact
     nil
+  end
+
+  # Translate a Solr search field to an EBSCO field code.
+  #
+  # @param [String] search_field
+  #
+  # @return [String, nil]
+  #
+  def get_field_code(search_field)
+    search_field = search_field.to_s.squish
+    if search_field =~ /^[A-Z]{2}$/ # NOTE: 0% coverage for this case
+      search_field
+    else
+      search_field = search_field.tr(' ', '_').underscore
+      EBSCO::EDS::SOLR_SEARCH_TO_EBSCO_FIELD_CODE[search_field]
+    end
   end
 
   # Convert hashes to ActiveSupport::HashWithIndifferentAccess.

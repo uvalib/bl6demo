@@ -116,7 +116,7 @@ module ArticlesHelper
   def eds_index_publication_info(options = nil)
     values, opt = extract_config_value(options)
     separator = opt.delete(:separator) || "<br/>\n"
-    unless values.present?
+    unless values.present? # NOTE: 0% coverage for this case
       doc = (options[:document] if options.respond_to?(:[]))
       values = (doc[:eds_publication_date] if doc.is_a?(Blacklight::Document))
     end

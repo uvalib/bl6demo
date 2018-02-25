@@ -6,7 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
-require 'blacklight_advanced_search/eds/advanced_controller_eds'
+require 'blacklight_advanced_search/advanced_controller_solr'
 
 # Overrides the Blacklight Advanced Search class of the same name.
 #

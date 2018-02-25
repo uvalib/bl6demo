@@ -108,7 +108,7 @@ module SessionConcern
   # @return [void]
   #
   def resolve_sort
-    return unless defined?(lens_key)
+    return unless defined?(lens_key) # TODO: Find a better criterion
     return if params.except(:controller, :action).empty?
     sort      = params[:sort].presence
     new_sort  = nil
@@ -143,11 +143,13 @@ module SessionConcern
 
     changed = false
 
-    # Eliminate hidden form fields that are not needed for search and empty
-    # parameters (keys with no values or values with no keys).
+    # Eliminate "noise" parameters (usually generated from the advanced search
+    # form), including 'op="AND"' since this is always the default logical
+    # operation.
     original_size = params.to_unsafe_h.size
     params.delete_if { |k, v| k.blank? || v.blank? }
     %w(utf8).each { |k| params.delete(k) }
+    params.delete(:op) if params[:op] == 'AND'
     reset_search = (params.delete(:commit) == 'Search')
     changed ||= (params.to_unsafe_h.size != original_size)
 

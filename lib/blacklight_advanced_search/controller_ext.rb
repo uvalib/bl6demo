@@ -19,6 +19,9 @@ module BlacklightAdvancedSearch::ControllerExt
 
   include BlacklightAdvancedSearch::Controller unless ONLY_FOR_DOCUMENTATION
 
+  include BlacklightAdvancedSearch::RenderConstraintsOverrideExt
+  include BlacklightAdvancedSearch::CatalogHelperOverrideExt
+
   # Code to be added to the controller class including this module.
   included do |base|
 

@@ -43,10 +43,6 @@ override EBSCO::EDS::Results do
     @limiters    = additional_limiters || []
     @raw_options = options || {}
 
-    $stderr.puts "((( EBSCO::EDS::Results @raw_options = #{@raw_options.inspect}"
-    $stderr.puts "((( EBSCO::EDS::Results @limiters = #{@limiters.inspect}"
-    $stderr.puts "((( EBSCO::EDS::Results @results = #{@results.inspect}"
-
     result               = @results['SearchResult'] || {}
     data_records         = result.dig('Data', 'Records') || []
     statistics           = result['Statistics'] || {}
@@ -78,7 +74,7 @@ override EBSCO::EDS::Results do
 
     # Create a special list of research starter records.
     @research_starters =
-      related_records.flat_map { |item|
+      related_records.flat_map { |item| # NOTE: 0% coverage for this case
         next unless item['Type'] == 'rs'
         recs = item['Records'] || []
         recs.map { |rec| EBSCO::EDS::Record.new(rec, eds_config) }
@@ -86,7 +82,7 @@ override EBSCO::EDS::Results do
 
     # Create a special list of exact match publications.
     @publication_match =
-      related_publications.flat_map { |item|
+      related_publications.flat_map { |item| # NOTE: 0% coverage for this case
         next unless item['Type'] == 'emp'
         recs = item['PublicationRecords'] || []
         recs.map { |rec| EBSCO::EDS::Record.new(rec, eds_config) }
@@ -263,6 +259,34 @@ override EBSCO::EDS::Results do
 
     }.flatten.compact
 
+  end
+
+  # Returns a hash of the date range available for the search.
+  #
+  # @return [Hash]
+  #
+  # @example
+  # { mindate: '1501-01',
+  #   maxdate: '2018-04',
+  #   minyear: '1501',
+  #   maxyear: '2018' }
+  #
+  def date_range
+    dr = @results.dig('SearchResult', 'AvailableCriteria', 'DateRange') || {}
+    mindate = dr['MinDate'].to_s
+    maxdate = dr['MaxDate'].to_s
+    minyear = mindate[0..3]
+    maxyear = maxdate[0..3]
+
+    # Cap max_date/max_year to current year + 1 (to filter any erroneous
+    # database metadata).
+    current_year = Time.new.year
+    if maxyear.to_i > current_year
+      maxyear = (current_year + 1).to_s
+      maxdate = maxyear + '-01'
+    end
+
+    { mindate: mindate, maxdate: maxdate, minyear: minyear, maxyear: maxyear }
   end
 
   # Returns a simple list of the search terms used. Boolean operators are not

@@ -22,7 +22,7 @@ override Blacklight::Configuration do
     field = field.to_s
     facet_fields[field] ||
       facet_fields.find { |_, field_def| field == field_def.field }&.last ||
-      FacetField.new(field: field).normalize!
+      Blacklight::Configuration::FacetField.new(field: field).normalize!
   end
 
 end

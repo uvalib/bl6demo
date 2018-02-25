@@ -116,9 +116,8 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
     # Advanced search constraints.
     qp = advanced_query(req_params)
     if qp&.filters&.present?
-      op_label   = qp.keyword_op
       op_options = { class: 'text-muted constraint-connector' }
-      connector  = content_tag(:strong, op_label, op_options)
+      connector  = content_tag(:strong, filter_connector, op_options)
       result +=
         qp.filters.map do |field, values|
           label  = facet_field_label(field)
@@ -182,7 +181,7 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
       qp.filters.map do |field, values|
         label  = facet_field_label(field)
         values = values.keys if values.is_a?(Hash) # Old-style.
-        values = values.join(" #{qp.keyword_op} ") # e.g.: 'OR'
+        values = values.join(" #{filter_connector} ")
         render_search_to_s_element(label, values)
       end
     result.delete_if(&:blank?)
@@ -206,9 +205,10 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
     result = [super(req_params)]
     # Advanced :search_field searches.
     qp = query_parser(req_params)
-    if (qp.keyword_queries.size > 1) && (qp.keyword_op == 'OR') # NOTE: 0% coverage for this case
+    op = qp.keyword_op
+    if (qp.keyword_queries.size > 1) && (op == 'OR') # NOTE: 0% coverage for this case
       # Need to do something to make the inclusive-or search clear.
-      any_of = t("blacklight_advanced_search.op.#{qp.keyword_op}.filter_label")
+      any_of = t("blacklight_advanced_search.op.#{op}.filter_label")
       any_of.capitalize!
       queries =
         qp.keyword_queries.map { |field, query|
@@ -296,6 +296,18 @@ module BlacklightAdvancedSearch::RenderConstraintsOverrideExt
   def params_hash(req_params = nil)
     req_params ||= params
     Blacklight::SearchStateExt.new(req_params, blacklight_config).to_h
+  end
+
+  # Return the localized string for the logical connector displayed between
+  # filter values.
+  #
+  # @param [String, nil] op           Default: 'OR'.
+  #
+  # @return [String]
+  #
+  def filter_connector(op = nil)
+    op ||= 'OR'
+    t("blacklight.#{op.downcase}", default: op).upcase
   end
 
 end

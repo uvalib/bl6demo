@@ -159,8 +159,6 @@ module Blacklight::BookmarksExt
   # This method replaces:
   # @see Blacklight::Bookmarks#destroy
   #
-  # NOTE: 0% coverage for this method
-  #
   def destroy
     table    = current_or_guest_user.bookmarks
     bookmark = bookmark_criteria(params[:id], params[:type])
@@ -174,10 +172,10 @@ module Blacklight::BookmarksExt
         render json: { bookmarks: { count: count } }
 =end
         render json: { bookmarks: { count: table.count } }
-      else
+      else # NOTE: 0% coverage for this case
         head 500
       end
-    else
+    else # NOTE: 0% coverage for this case
       if success
         go_back notice: t('blacklight.bookmarks.remove.success')
       else

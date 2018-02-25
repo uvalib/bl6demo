@@ -302,7 +302,7 @@ override EBSCO::EDS::Session do
       # Create temporary facet results if needed.
       # TODO: should this also be considering 'f_inclusive' facets?
       facets = options['f']
-      if facets.present? # NOTE: 0% coverage for this case
+      if facets.present?
         # Create temporary format facet results if needed.
         target_facet = 'eds_publication_type_facet'
         if facets.key?(target_facet)
@@ -315,7 +315,7 @@ override EBSCO::EDS::Session do
         end
         # Create temporary content provider facet results if needed.
         target_facet = 'eds_content_provider_facet'
-        if facets.key?(target_facet)
+        if facets.key?(target_facet) # NOTE: 0% coverage for this case
           tmp_options = options.except('f')
           tmp_options['f'] = options['f'].except(target_facet)
           tmp_search_options = EBSCO::EDS::Options.new(tmp_options, @info)

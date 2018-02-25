@@ -32,6 +32,7 @@ module RescueConcern
       Errno::ENETRESET,
       Errno::ENETUNREACH,
       Faraday::ConnectionFailed,
+      Faraday::TimeoutError,
     ], with: :handle_connect_error
 
     # The index action will more than likely throw this one.

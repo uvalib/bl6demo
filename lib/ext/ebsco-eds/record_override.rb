@@ -229,14 +229,14 @@ override EBSCO::EDS::Record do
     result +=
       ebsco_links.map { |link|
         next unless link['Type'] == (type = 'ebook-pdf')
-        @eds_ebook_pdf_fulltext_available = true
+        @eds_ebook_pdf_fulltext_available = true # NOTE: 0% coverage for this case
         make_link(__method__, type, true, link['Url'])
       }.compact
 
     result +=
       ebsco_links.map { |link|
         next unless link['Type'] == (type = 'ebook-epub')
-        @eds_ebook_epub_fulltext_available = true
+        @eds_ebook_epub_fulltext_available = true # NOTE: 0% coverage for this case
         make_link(__method__, type, true, link['Url'])
       }.compact
 
@@ -251,11 +251,11 @@ override EBSCO::EDS::Record do
           link_url  = data[url_start..-1]
           url_end   = link_url.index('&quot;') - 1
           link_url  = link_url[0..url_end]
-          unless (link_label = label)
+          unless (link_label = label) # NOTE: 0% coverage for this case
             label_start = data.index('link&gt;') + 8
             link_label  = data[label_start..-1].strip
           end
-        else
+        else # NOTE: 0% coverage for this case
           link_url   = data
           link_label = label
         end
@@ -265,7 +265,7 @@ override EBSCO::EDS::Record do
     result +=
       ebsco_links.map { |link|
         next unless link['Type'] == 'other'
-        @eds_pdf_fulltext_available = true
+        @eds_pdf_fulltext_available = true # NOTE: 0% coverage for this case
         make_link(__method__, 'smartlinks', false, link['Url'])
       }.compact
 
@@ -306,7 +306,7 @@ override EBSCO::EDS::Record do
     i18n_scope, type, expires, lnk, label, icon = args
     case lnk
       when Hash  then url, label, icon = lnk['Url'], lnk['Text'], lnk['Icon']
-      when Array then url, label, icon = lnk
+      when Array then url, label, icon = lnk # NOTE: 0% coverage for this case
       else            url = lnk
     end
     unless i18n_scope.to_s.include?('.')

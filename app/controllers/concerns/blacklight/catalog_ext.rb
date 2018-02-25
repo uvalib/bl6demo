@@ -134,7 +134,7 @@ module Blacklight::CatalogExt
       if url && (url.start_with?('/') || (url =~ URI.regexp))
         uri = URI.parse(url)
         uri.query ? "#{uri.path}?#{uri.query}" : uri.path
-      else
+      else # NOTE: 0% coverage for this case
         blacklight_config.document_model.new(id: params[:id])
       end
     redirect_to path, status: 303

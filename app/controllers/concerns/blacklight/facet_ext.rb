@@ -36,10 +36,6 @@ module Blacklight
     # @see Blacklight::Facet#facet_paginator
     #
     def facet_paginator(field_config, response_data)
-      $stderr.puts ">>> #{__method__}: sort: #{response_data.sort.pretty_inspect}" # TODO: debugging - remove
-      $stderr.puts ">>> #{__method__}: offset: #{response_data.offset.pretty_inspect}" # TODO: debugging - remove
-      $stderr.puts ">>> #{__method__}: prefix: #{response_data.prefix.pretty_inspect}" # TODO: debugging - remove
-      $stderr.puts ">>> #{__method__}: limit: #{facet_limit_for(field_config.key).pretty_inspect}" # TODO: debugging - remove
       blacklight_config.facet_paginator_class.new(
         response_data.items,
         sort:   response_data.sort,

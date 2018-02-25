@@ -73,15 +73,15 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
   # @see Blacklight::SearchHistoryConstraintsHelperBehavior#render_search_to_s_filters
   #
   def render_search_to_s_filters(params)
-    separator =
-      content_tag(:span, " #{t('blacklight.and')} ", class: 'filterSeparator')
+    connector = t('blacklight.and', default: 'AND')
+    connector = content_tag(:span, " #{connector} ", class: 'filterSeparator')
     facets = params[:f] || {}
     facets.map { |field, values|
       label = facet_field_label(field)
       value =
         values.map { |value|
           render_filter_value(value, field)
-        }.join(separator).html_safe
+        }.join(connector).html_safe
       render_search_to_s_element(label, value)
     }.join("\n").html_safe
   end
@@ -93,7 +93,7 @@ module Blacklight::SearchHistoryConstraintsHelperBehaviorExt
   # @param [String, Array<String>] value      Multiple values joined with "and"
   # @param [Hash, nil]             _options
   #
-  # @option options [Boolean] :escape_value   To pass in pre-prerended HTML
+  # @option options [Boolean] :escape_value   To pass in pre-rendered HTML
   #                                             for value.
   #                                           NOTE: never implemented; not used
   #

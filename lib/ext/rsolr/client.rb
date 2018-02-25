@@ -28,8 +28,8 @@ override RSolr::Client do
     url:            'http://127.0.0.1:8983/solr/',
     conn_opt: {
       request: {
-        timeout:        3.seconds,
-        open_timeout:   2.seconds,
+        timeout:        4.seconds,
+        open_timeout:   3.seconds,
         params_encoder: Faraday::FlatParamsEncoder
       },
     },

@@ -1,0 +1,10 @@
+<%# app/views/music/_featured.html.erb -%>
+<%-
+  # Music lens "featured" items.
+  items = [ # TODO: testing; remove
+    'music one...',
+    'music two...',
+    'music three...'
+  ]
+-%>
+<%= render 'shared/featured', featured_items: items %>

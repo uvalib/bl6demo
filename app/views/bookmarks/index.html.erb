@@ -1,30 +1,54 @@
 <%# app/views/bookmarks/index.html.erb -%>
 <%-
-  # NOTE: Added to render each type of document separately according to its presenter
+  # The "Bookmarks" page renders each document type according to its own
+  # presenter.
+  #
+  # The structure of this template aligns closely with that of:
+  # @see app/views/saved_searches/index.html.erb
+  # @see app/views/search_history/index.html.erb
 
-  @page_title =
-    t('blacklight.bookmarks.page_title', application_name: application_name)
+  i18n_opt = { scope: 'blacklight.bookmarks' }
+  page_heading = t('title', i18n_opt)
+  column_width = 'col-md-12'
 
-  page_heading = t('blacklight.bookmarks.title')
+  @page_title = t(
+    'page_title',
+    i18n_opt.merge(
+      application_name: application_name,
+      default:          page_heading
+    )
+  )
 
-  section_heading =
+  error =
     if current_or_guest_user.blank?
-      t('blacklight.bookmarks.need_login')
+      'need_login'
     elsif @document_list.blank?
-      t('blacklight.bookmarks.no_bookmarks')
+      'no_bookmarks'
     end
 
-  template_opts = { document_list: @document_list, }
+  if error
+    error = t(error, i18n_opt)
+    template_opts = nil
+  else
+    template_opts = { document_list: @document_list }
+  end
 -%>
-<div id="content" class="col-md-12">
+
+<div id="content" class="<%= column_width -%>">
+
   <h2 class='page-heading'><%= page_heading %></h2>
-  <%- if section_heading -%>
-    <h3 class='section-heading'><%= section_heading %></h3>
+
+  <%- if error -%>
+
+    <h3 class='section-heading'><%= error %></h3>
+
   <%- else -%>
+
     <%= render 'sort_and_per_page' %>
     <%= render 'tools', template_opts %>
     <%= render 'document_list', template_opts %>
     <%= render 'results_pagination' %>
-  <%- end -%>
-</div>
 
+  <%- end -%>
+
+</div>

@@ -6,7 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
-require 'config/_constants'
+require 'config/_common'
 
 # Common helper methods.
 #

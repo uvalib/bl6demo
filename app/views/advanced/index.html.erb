@@ -2,26 +2,21 @@
 <%-
   # Advanced search page.
 
-  @page_title = "More Search Options - #{application_name}"
+  lens = current_lens_key
 
-  in_articles =
-    request.path.include?('/articles/') || request.path.end_with?('/articles')
+  @page_title = h("#{lens.capitalize} Advanced Search")
 
   form_title  = t('blacklight_advanced_search.form.title')
 
   clear_label = t('blacklight_advanced_search.form.start_over')
+  clear_path  = advanced_search_path(lens)
   clear_class = 'btn btn-default pull-right advanced-search-start-over'
-  clear_path  =
-    if in_articles
-      articles_advanced_search_path
-    else
-      catalog_advanced_search_path
-    end
+  clear_opt   = { class: clear_class }
 -%>
 <div class="advanced-search-form col-sm-12">
   <h1 class="advanced page-header">
     <%= form_title %>
-    <%= link_to clear_label, clear_path, class: clear_class %>
+    <%= link_to clear_label, clear_path, clear_opt %>
   </h1>
   <div class="row">
     <div class="col-md-8"><%= render 'advanced_search_form' %></div>

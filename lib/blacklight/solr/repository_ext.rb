@@ -46,6 +46,7 @@ module Blacklight::Solr
     SB_CATALOG_FILTERS = %i(
       show_only_public_records
       show_only_discoverable_records
+      show_only_lens_records
     )
 
     # =========================================================================
@@ -152,7 +153,6 @@ module Blacklight::Solr
     # @see Blacklight::Solr::Repository#send_and_receive
     #
     def send_and_receive(path, solr_params = nil)
-      $stderr.puts("++++++++++++++++++++++++++++++++++++++++++ #{__method__}") # TODO: debugging - remove
       benchmark('Solr fetch', level: :debug) do
         # Send to Solr.
         cfg  = blacklight_config
@@ -313,7 +313,6 @@ module Blacklight::Solr
     # @return [Blacklight::Solr::Request]
     #
     def base_document_solr_params(config, url_params = nil, sb_filters = nil)
-      $stderr.puts("++++++++++++++++++++++++++++++++++++++++++ #{__method__}") # TODO: debugging - remove
       sb_filters ||= SB_DOCUMENT
       solr_params =
         Blacklight::Solr::Request.new(config.default_document_solr_params)
@@ -352,7 +351,6 @@ module Blacklight::Solr
     # @return [Blacklight::Solr::Request]
     #
     def base_solr_params(config, url_params = nil, sb_filters = nil)
-      $stderr.puts("++++++++++++++++++++++++++++++++++++++++++ #{__method__}") # TODO: debugging - remove
       sb_filters ||= SB_SEARCH
       solr_params = Blacklight::Solr::Request.new(config.default_solr_params)
       solr_params[:qt] = config.qt || solr_params[:qt] || 'search'
@@ -395,10 +393,10 @@ module Blacklight::Solr
             end
           # Ensure that certain Solr fields passed through *url_params* will be
           # preserved even though SearchBuilder does not work with them.
+          url_params ||= {}
+          url_params.reverse_merge!(controller: blacklight_config.lens_key)
           merge_params, url_params =
-            url_params.partition { |k, _|
-              %i(facet fl).include?(k.to_sym)
-            } if url_params.is_a?(Hash)
+            url_params.partition { |k, _| %i(facet fl).include?(k.to_sym) }
           url_params = sb.with(url_params.to_h).merge(merge_params.to_h)
         end
         only   = Array.wrap(sb_filters[:only])

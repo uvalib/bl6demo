@@ -1,0 +1,10 @@
+<%# app/views/video/_featured.html.erb -%>
+<%-
+  # Video lens "featured" items.
+  items = [ # TODO: testing; remove
+    'video one...',
+    'video two...',
+    'video three...'
+  ]
+-%>
+<%= render 'shared/featured', featured_items: items %>

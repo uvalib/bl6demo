@@ -23,6 +23,8 @@ module Blacklight
       empty?
       blank?
       present?
+      key?
+      has_key?
     ).freeze
 
     # =========================================================================
@@ -33,11 +35,8 @@ module Blacklight
 
     # Initialize a self instance.
     #
-    # @param [Blacklight::Lens, Array<Blacklight::Lens>, nil] lens
-    #
-    def initialize(lens = nil)
+    def initialize
       @hash = LENS_KEYS.map { |k| [k, nil] }.to_h.with_indifferent_access
-      add(lens) if lens.present?
     end
 
     # =========================================================================
@@ -55,7 +54,8 @@ module Blacklight
     # @return [Blacklight::Lens, nil]
     #
     def [](key)
-      @hash[key_for(key)]
+      key = key_for(key, false)
+      @hash[key] if key
     end
 
     # Set lens by key.
@@ -66,7 +66,8 @@ module Blacklight
     # @return [Blacklight::Lens, nil]
     #
     def []=(key, entry)
-      @hash[key_for(key)] = entry
+      key = key_for(key) unless valid_key?(key)
+      @hash[key] = entry if key
     end
 
   end

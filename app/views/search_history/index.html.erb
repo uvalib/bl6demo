@@ -1,18 +1,36 @@
 <%# app/views/search_history/index.html.erb -%>
 <%-
-  page_title ||= :'blacklight.search_history.page_title'
-  @page_title = t(page_title, application_name: application_name)
+  # The "Search History" page renders each document type according to its own
+  # presenter.
+  #
+  # The structure of this template aligns closely with:
+  # @see app/views/saved_searches/index.html.erb
+  # @see app/views/bookmarks/index.html.erb
 
-  no_searches = list_heading = clear_list_button = ctrlrs = delete_label = nil
-  save_label = nil
+  i18n_opt = { scope: 'blacklight.search_history' }
+  page_heading = t('title', i18n_opt)
+  column_width = 'col-md-9'
 
-  page_heading = t('blacklight.search_history.title')
-  if @searches.blank?
-    no_searches = t('blacklight.search_history.no_history')
+  @page_title = t(
+    'page_title',
+    i18n_opt.merge(
+      application_name: application_name,
+      default:          page_heading
+    )
+  )
+
+  error =
+    if @searches.blank?
+      'no_searches'
+    end
+
+  if error
+    error = t(error, i18n_opt)
+    list_heading = clear_list_button = save_label = delete_label = ctrlrs = nil
   else
-    list_heading       = t('blacklight.search_history.recent')
-    clear_list_title   = t('blacklight.search_history.clear.action_title')
-    clear_confirmation = t('blacklight.search_history.clear.action_confirm')
+    list_heading       = t('recent', i18n_opt)
+    clear_list_title   = t('clear.action_title', i18n_opt)
+    clear_confirmation = t('clear.action_confirm', i18n_opt)
     clear_list_path    = blacklight.clear_search_history_path
     clear_list_button  =
       link_to(
@@ -22,19 +40,19 @@
         data:   { confirm: clear_confirmation },
         class:  'btn btn-danger pull-right'
       )
-    save_label   = t('blacklight.search_history.save')
-    delete_label = t('blacklight.search_history.forget')
+    save_label   = t('save', i18n_opt)
+    delete_label = t('forget', i18n_opt)
     ctrlrs = {}
   end
 -%>
 
-<div id="content" class="col-md-9">
+<div id="content" class="<%= column_width -%>">
 
   <h2 class='page-heading'><%= page_heading %></h2>
 
-  <%- if no_searches -%>
+  <%- if error -%>
 
-    <h3 class='section-heading'><%= no_searches %></h3>
+    <h3 class='section-heading'><%= error %></h3>
 
   <%- else -%>
 
@@ -47,14 +65,11 @@
         <%- query = search.query_params || {} -%>
         <%- next unless query_has_constraints?(query) -%>
         <%- type = lens_key_for(query[:controller]) -%>
-        <%- type_class = (type == :catalog) ? 'info' : 'warning' -%>
         <%- ctrlrs[type] ||= lens_for(type).instance(@response, request) -%>
         <%- index += 1 -%>
         <tr id="<%= "document_#{index}" -%>">
           <td class="search-type">
-            <div class="label label-<%= type_class -%> search-type">
-              <%= type.capitalize -%>
-            </div>
+            <%= search_type_label(type) %>
           </td>
           <td class="query">
             <%= ctrlrs[type].instance_exec(query) do |query| -%>

@@ -1,9 +1,8 @@
 <%# app/views/catalog/_search_form.html.erb -%>
 <%-
-  in_articles =
-    request.path.include?('/articles/') || request.path.end_with?('/articles')
-  suggest_path =
-    in_articles ? articles_suggest_index_path : catalog_suggest_index_path
+  lens ||= current_lens_key
+
+  suggest_path = suggest_index_path(lens)
 
   url       ||= search_action_url
   css_class ||= 'search-query-form'
@@ -44,12 +43,9 @@
   submit_label = t('blacklight.search.form.submit')
 
   adv_label = 'More options'
-  adv_path  =
-    if in_articles
-      articles_advanced_search_path(search_state.to_h)
-    else
-      catalog_advanced_search_path(search_state.to_h)
-    end
+  adv_path  = search_state.to_h.except(:controller, :action)
+  adv_path  = advanced_search_path(lens, adv_path)
+  adv_opt   = { class: 'advanced_search btn btn-default' }
 -%>
 
 <%= form_tag url, method: :get, class: css_class, role: 'search' do %>
@@ -77,5 +73,5 @@
 <%- end -%>
 
 <div class="navbar-form">
-  <%= link_to adv_label, adv_path, class: 'advanced_search btn btn-default' %>
+  <%= link_to adv_label, adv_path, adv_opt %>
 </div>

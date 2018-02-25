@@ -43,20 +43,32 @@ module EdsConcern
     # Handle EBSCO EDS communication failures.
     rescue_from EBSCO::EDS::Error, with: :handle_ebsco_eds_error
 
-  end
+    # =========================================================================
+    # :section:
+    # =========================================================================
 
-  # ===========================================================================
-  # :section:
-  # ===========================================================================
+    public
 
-  public
+    # The default controller for searches.
+    #
+    # @return [Class]
+    #
+    # NOTE: 0% coverage for this method
+    #
+    def default_catalog_controller
+      ArticlesController
+    end
 
-  # The default controller for searches.
-  #
-  # @return [Class]
-  #
-  def default_catalog_controller
-    ArticlesController
+    # The default controller for searches.
+    #
+    # @return [Class]
+    #
+    # NOTE: 0% coverage for this method
+    #
+    def self.default_catalog_controller
+      ArticlesController
+    end
+
   end
 
   # ===========================================================================

@@ -27,6 +27,28 @@ module CatalogConcern
       copy_blacklight_config_from(CatalogController)
     end
 
+    # =========================================================================
+    # :section:
+    # =========================================================================
+
+    public
+
+    # The default controller for searches.
+    #
+    # @return [Class]
+    #
+    def default_catalog_controller
+      CatalogController
+    end
+
+    # The default controller for searches.
+    #
+    # @return [Class]
+    #
+    def self.default_catalog_controller
+      CatalogController
+    end
+
   end
 
 end

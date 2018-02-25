@@ -1,37 +1,44 @@
 <%# app/views/root/_home_text.html.erb -%>
 <%-
   # Content for the application main page.
-  # For the time being, this is encorporated by catalog/_home.html.erb.
+  # For the time being, this is incorporated into catalog/_home.html.erb.
+  links = {
+    'Catalog search "home" page'      => catalog_home_path,
+    'Catalog advanced search'         => catalog_advanced_search_path,
+    'Articles search "home" page'     => articles_home_path,
+    'Articles advanced search'        => articles_advanced_search_path,
+    'Video search "home" page'        => video_home_path,
+    'Video advanced search'           => video_advanced_search_path,
+    'Music search "home" page'        => music_home_path,
+    'Music advanced search'           => music_advanced_search_path,
+    'User-selected bookmarked items'  => bookmarks_path,
+    'User-selected saved searches'    => blacklight.saved_searches_path,
+    'Searches for current session'    => blacklight.search_history_path,
+  }.map { |td, th|
+    content_tag(:tr) do
+      content_tag(:th, link_to(h(th), th)) + content_tag(:td, h(td))
+    end
+  }.join("\n").html_safe
 -%>
 <div>
   <h3 class='section-heading'>Welcome</h3>
   <p>
-    This is a demonstration of Blacklight 6 with modifications to support
-    index retrieval from both Solr for catalog search and EBSCO EDS for
-    articles search.  Routes include:
+    This is a demonstration of Blacklight 6 with "Blacklight Lens"
+    modifications &ndash; supporting retrieval from multiple index search
+    providers (Solr for Catalog search; EBSCO Discovery Service [EDS] for
+    Articles search) and tailored configurations to provide context-driven
+    search experiences (e.g. Video and Music variations on Catalog search).
   </p>
-  <table style="width: 100%">
-    <thead>
-      <th style="width: 25%">Link</th>
-      <th>Description</th>
-    </thead>
-    <tr>
-      <th><a href="catalog">/catalog</a></th>
-      <td>Catalog search "home" page.</td>
-    </tr>
-    <tr>
-      <th><a href="catalog/advanced">/catalog/advanced</a></th>
-      <td>Catalog advanced search form.</td>
-    </tr>
-    <tr>
-      <th><a href="articles">/articles</a></th>
-      <td>Articles search "home" page.</td>
-    </tr>
-    <tr>
-      <th><a href="articles/advanced">/articles/advanced</a></th>
-      <td>Articles advanced search form.</td>
-    </tr>
-  </table>
+  <%- if links.present? -%>
+    <p>Routes include:</p>
+    <table style="width: 100%">
+      <thead>
+        <th style="width: 25%">Link</th>
+        <th>Description</th>
+      </thead>
+      <%= links %>
+    </table>
+  <%- end -%>
 </div>
 <%# This is the same panel shown in the Rails welcome template -%>
 <div id="about">

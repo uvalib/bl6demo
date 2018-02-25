@@ -16,24 +16,7 @@ module Config
     extend ActiveSupport::Concern
 
     # =========================================================================
-    # :section:
-    # =========================================================================
-
-    public
-
-    # Initialize a self instance.
-    #
-    # @param [Symbol]                    key
-    # @param [Blacklight::Configuration] config
-    #
-    def initialize(key, config)
-      @key    = key
-      self.key ||= key
-      Blacklight::Lens[@key] ||= Blacklight::Lens.new(@key, config)
-    end
-
-    # =========================================================================
-    # :section:
+    # :section: Class methods
     # =========================================================================
 
     public
@@ -42,17 +25,11 @@ module Config
     #
     module ClassMethods
 
-      # =======================================================================
-      # :section: Class methods
-      # =======================================================================
-
-      public
-
       # The lens key for the configuration class.
       #
       # @return [Symbol]
       #
-      attr_reader :key
+      attr_accessor :key
 
       # The Blacklight configuration associated with the configuration class.
       #
@@ -70,24 +47,41 @@ module Config
         blacklight_config.deep_copy
       end
 
-      # =======================================================================
-      # :section: Class methods
-      # =======================================================================
-
-      protected
-
-      # Internally, allow assignment to the lens key for the configuration
-      # class.
+      # Set key.
+      #
+      # @param [Symbol] lens_key
       #
       # @return [Symbol]
       #
-      attr_writer :key
+      def key=(lens_key)
+        Rails.logger.error {
+          "#{__method__}(lens_key.inspect): was: #{@key.inspect}"
+        } if @key
+        @key = lens_key
+      end
 
     end
 
     # Define these as instance methods as well as class methods.
-    #
     include ClassMethods
+
+    # =========================================================================
+    # :section:
+    # =========================================================================
+
+    public
+
+    # Initialize a self instance.
+    #
+    # @param [Blacklight::Configuration] config
+    # @param [Symbol, nil]               lens_key
+    #
+    def initialize(config, lens_key = nil)
+      lens_key ||= config.lens_key
+      @key = lens_key
+      self.key ||= lens_key
+      Blacklight::Lens[@key] ||= Blacklight::Lens.new(@key, config)
+    end
 
   end
 
@@ -97,6 +91,8 @@ module Config
 
   autoload :Articles, 'config/articles'
   autoload :Catalog,  'config/catalog'
+  autoload :Music,    'config/music'
+  autoload :Video,    'config/video'
 
 end
 

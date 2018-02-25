@@ -5,12 +5,13 @@
 
 __loading_begin(__FILE__)
 
-require_relative '_constants'
+require_relative '_common'
 require 'blacklight/solr/repository_ext'
 
 class Config::Solr
 
-  include Config::Constants
+  # Default Blacklight Lens for controllers based on this configuration.
+  SOLR_DEFAULT_LENS = :catalog
 
   # === Common field values ===
   # Certain "index" and "show" configuration fields have the same values based
@@ -70,6 +71,12 @@ class Config::Solr
       $stderr.puts('ERROR: ' + alert)
     end
     @instance ||= Blacklight::Configuration.new do |config|
+
+      include Config::Common
+      extend  Config::Common
+
+      # Default Blacklight Lens for controllers based on this configuration.
+      config.lens_key = SOLR_DEFAULT_LENS
 
       # === Search request configuration ===
 
@@ -141,15 +148,13 @@ class Config::Solr
       #config.connection_config = ...
 
       # === Configuration for navbar ===
-      #
       # @see Blacklight::Configuration#add_nav_action
-      #
+
       #config.navbar = OpenStructWithHashAccess.new(partials: {})
 
       # === Configuration for search results/index views ===
-      #
       # @see Blacklight::Configuration::ViewConfig::Index
-      #
+
       config.index.document_presenter_class = Blacklight::IndexPresenterExt
       config.index.display_type_field = SOLR_FIELD[:display_type_field]
       config.index.title_field        = SOLR_FIELD[:title_field]
@@ -160,9 +165,8 @@ class Config::Solr
       config.index.thumbnail_field    = SOLR_FIELD[:thumbnail_field].last
 
       # === Configuration for document/show views ===
-      #
       # @see Blacklight::Configuration::ViewConfig::Show
-      #
+
       config.show.document_presenter_class = Blacklight::ShowPresenterExt
       config.show.display_type_field  = SOLR_FIELD[:display_type_field]
       config.show.title_field         = SOLR_FIELD[:title_field]
@@ -171,13 +175,11 @@ class Config::Solr
       config.show.author_field        = SOLR_FIELD[:author_field]
       config.show.alt_author_field    = SOLR_FIELD[:alt_author_field]
       config.show.thumbnail_field     = SOLR_FIELD[:thumbnail_field]
-      config.show.route               = { controller: :catalog }
       config.show.partials            = [:show_header, :thumbnail, :show]
 
       # === Configurations for specific types of index views ===
-      #
       # @see Blacklight::Configuration#view_config
-      #
+
       #config.view =
       #  Blacklight::NestedOpenStructWithHashAccess.new(
       #    Blacklight::Configuration::ViewConfig,
@@ -223,61 +225,34 @@ class Config::Solr
       # values).
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
-      #
-      config.add_facet_field :library_facet,            label: 'Library'
-      config.add_facet_field :format_facet,             label: 'Format'
-      config.add_facet_field :author_facet,             label: 'Author'
-      config.add_facet_field :subject_facet,            label: 'Subject'
-      config.add_facet_field :series_title_facet,       label: 'Series'
-      config.add_facet_field :digital_collection_facet, label: 'Digital Collection'
-      config.add_facet_field :call_number_broad_facet,  label: 'Call Number Range'
-      config.add_facet_field :language_facet,           label: 'Language'
-      config.add_facet_field :region_facet,             label: 'Geographic Location'
-      config.add_facet_field :published_date_facet,     label: 'Publication Era'
-      config.add_facet_field :category_facet,           label: 'Category'
-      config.add_facet_field :group_facet,              label: 'Group'
-      config.add_facet_field :signature_facet,          label: 'Signature'
-      config.add_facet_field :use_facet,                label: 'Permissions'
-      config.add_facet_field :license_class_facet,      label: 'License'
-      config.add_facet_field :source_facet,             label: 'Source'
-      config.add_facet_field :location2_facet,          label: 'Shelf Location'
-      config.add_facet_field :year_multisort_i,         label: 'Year'
-      config.add_facet_field :collection_facet,         label: 'Coin Collection'
 
-=begin
-    config.add_facet_field :example_pivot_field, label: 'Pivot Field', pivot: %w(format_facet language_facet)
+      config.add_facet_field :library_facet
+      config.add_facet_field :format_facet
+      config.add_facet_field :author_facet
+      config.add_facet_field :subject_facet
+      config.add_facet_field :series_title_facet
+      config.add_facet_field :digital_collection_facet
+      config.add_facet_field :call_number_broad_facet
+      config.add_facet_field :language_facet
+      config.add_facet_field :region_facet
+      config.add_facet_field :published_date_facet
+      config.add_facet_field :category_facet
+      config.add_facet_field :group_facet
+      config.add_facet_field :signature_facet
+      config.add_facet_field :use_facet
+      config.add_facet_field :license_class_facet
+      config.add_facet_field :source_facet
+      config.add_facet_field :location2_facet
+      config.add_facet_field :year_multisort_i
+      config.add_facet_field :collection_facet         # TODO: testing; remove
+      config.add_facet_field :call_number_facet        # TODO: testing; remove?
+      config.add_facet_field :location_facet           # TODO: testing; remove
+      config.add_facet_field :torchbearer_facet        # TODO: testing; remove
+      config.add_facet_field :ml_number_facet          # TODO: testing; remove
 
-    now = Time.zone.now.year
-    config.add_facet_field :example_query_facet_field, label: 'Publish Date', query: {
-      years_5:  { label: 'within 5 Years',  fq: "published_date_facet:[#{now-5}  TO *]" },
-      years_10: { label: 'within 10 Years', fq: "published_date_facet:[#{now-10} TO *]" },
-      years_25: { label: 'within 25 Years', fq: "published_date_facet:[#{now-25} TO *]" }
-    }
-=end
-
-      # NOTE: The following fields need to have their values capitalized
-      # (that is, the data needs to be capitalized when acquired) so that you
-      # don't need to have an index_range that includes both upper- and lower-
-      # case letters in order to access the entire gamut of values:
-      #
-      #                             !"#$%&'()*+,-./ 0123456789 :;<=>?@ A-Z [\]^_` a-z {|}~
-      #                             --------------- ---------- ------- --- ------ --- ----
-      # alternate_form_title_facet  YYYY_YYY_YY_YYY YYYYYYYYYY Y_Y__YY YYY YY___Y YYY ____
-      # author_facet                _YYYYYYYYYYYYYY YYYYYYYYYY Y_YYYYY YYY YYY__Y YYY ____
-      # genre_facet                 _______Y_____Y_ YYYY___Y_Y _______ YYY Y_____ YYY ____
-      # journal_title_facet         _______________ YYYYYYYYYY _______ ___ ______ YYY ____
-      # location_facet              _______________ __YY______ _______ YYY ______ ___ ____
-      # location2_facet             _______________ ___Y______ _______ YYY ______ ___ ____
-      # region_facet                _Y____YY_Y__YY_ YYYYYYYYYY __YY___ YYY ______ YYY ____
-      # series_title_facet          YYYYYYYYYYYYYY_ YYYYYYYYYY Y_YY_YY YYY YY__YY YYY YY__
-      # subject_facet               YYYY_YYY_YYYYY_ YYYYYYYYYY Y_Y_YY_ YYY Y_____ YYY ____
-      # topic_form_genre_facet      YY_Y__YY_YYYYY_ YYYYYYYYYY __Y__YY YYY Y_____ YYY ____
-      # uniform_title_facet         YYY___YY_Y__YYY YYYYYYYYYY ___Y_YY YYY Y_____ YYY ____
-      #
-      # (The starting letter of values for other facets checked were within the
-      # range 'A'..'Z'.)
-      #
-      config.facet_fields.each_pair do |key, field_def|
+      # Set labels from locale for this lens and supply options that apply to
+      # multiple field configurations.
+      config.facet_fields.each_pair do |key, field|
 
         key = key.to_sym
 
@@ -288,13 +263,13 @@ class Config::Solr
           when :digital_collection_facet then 10
           when :call_number_broad_facet  then 15
           else                                20
-        end.tap { |limit| field_def.limit = limit if limit }
+        end.tap { |limit| field.limit = limit if limit }
 
         case key
           when :library_facet            then 'index'
           when :call_number_broad_facet  then 'index'
           else                                'count'
-        end.tap { |sort| field_def.sort = sort if sort }
+        end.tap { |sort| field.sort = sort if sort }
 
         case key
           when :alternate_form_title_facet  then "\x20".."\x7E"
@@ -311,14 +286,31 @@ class Config::Solr
           when :call_number_broad_facet     then nil
           when :year_multisort_i            then 0..9
           else                              'A'..'Z'
-        end.tap { |range| field_def.index_range = range if range }
+        end.tap { |range| field.index_range = range if range }
+
+        # NOTE: The following fields need to have their values capitalized
+        # (that is, the data needs to be capitalized when acquired) so that you
+        # don't need to have an index_range that includes both upper- and lower-
+        # case letters in order to access the entire gamut of values:
+        #
+        #                             !"#$%&'()*+,-./ 0123456789 :;<=>?@ A-Z [\]^_` a-z {|}~
+        #                             --------------- ---------- ------- --- ------ --- ----
+        # alternate_form_title_facet  YYYY_YYY_YY_YYY YYYYYYYYYY Y_Y__YY YYY YY___Y YYY ____
+        # author_facet                _YYYYYYYYYYYYYY YYYYYYYYYY Y_YYYYY YYY YYY__Y YYY ____
+        # genre_facet                 _______Y_____Y_ YYYY___Y_Y _______ YYY Y_____ YYY ____
+        # journal_title_facet         _______________ YYYYYYYYYY _______ ___ ______ YYY ____
+        # location_facet              _______________ __YY______ _______ YYY ______ ___ ____
+        # location2_facet             _______________ ___Y______ _______ YYY ______ ___ ____
+        # region_facet                _Y____YY_Y__YY_ YYYYYYYYYY __YY___ YYY ______ YYY ____
+        # series_title_facet          YYYYYYYYYYYYYY_ YYYYYYYYYY Y_YY_YY YYY YY__YY YYY YY__
+        # subject_facet               YYYY_YYY_YYYYY_ YYYYYYYYYY Y_Y_YY_ YYY Y_____ YYY ____
+        # topic_form_genre_facet      YY_Y__YY_YYYYY_ YYYYYYYYYY __Y__YY YYY Y_____ YYY ____
+        # uniform_title_facet         YYY___YY_Y__YYY YYYYYYYYYY ___Y_YY YYY Y_____ YYY ____
+        #
+        # (The starting letter of values for other facets checked were within the
+        # range 'A'..'Z'.)
 
       end
-
-      # Have BL send all facet field names to Solr, which has been the default
-      # previously. Simply remove these lines if you'd rather use Solr request
-      # handler defaults, or have no facets.
-      config.add_facet_fields_to_solr_request!
 
       # === Index (results page) metadata fields ===
       # Solr fields to be displayed in the index (search results) view.
@@ -326,23 +318,23 @@ class Config::Solr
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      # NOTE: IndexPresenterExt#label displays :title_display, :subtitle_display,
-      # and :linked_title_display so they do not need to be included here.
-      #
-      #config.add_index_field :title_display,           label: 'Title'
-      #config.add_index_field :subtitle_display,        label: 'Subtitle'
-      #config.add_index_field :linked_title_display,    label: 'Title'
-      config.add_index_field :format_facet,             label: 'Format',            helper_method: :format_facet_label
-      config.add_index_field :linked_author_display,    label: 'Author'
-      config.add_index_field :author_display,           label: 'Author'
-      config.add_index_field :language_facet,           label: 'Language'
-      config.add_index_field :year_display,             label: 'Date'
-      config.add_index_field :published_date_display,   label: 'Published'
-      config.add_index_field :digital_collection_facet, label: 'Digital Collection'
-      config.add_index_field :library_facet,            label: 'Library'
-      config.add_index_field :location_facet,           label: 'Location'
-      config.add_index_field :call_number_display,      label: 'Call number'
-      config.add_index_field :url_display,              label: 'Access Online',     helper_method: :url_link
+      # ==== Implementation Notes
+      # [1] IndexPresenterExt#label shows :title_display, :subtitle_display,
+      #     and :linked_title_display so they should not be included here.
+
+      config.add_index_field :format_facet, helper_method: :format_facet_label
+      config.add_index_field :linked_author_display
+      config.add_index_field :author_display
+      config.add_index_field :language_facet
+      config.add_index_field :year_display
+      config.add_index_field :published_date_display
+      config.add_index_field :digital_collection_facet
+      config.add_index_field :library_facet
+      config.add_index_field :location_facet
+      config.add_index_field :call_number_display
+      config.add_index_field :url_display, helper_method: :url_link
+      #config.add_index_field :id
+      config.add_index_field :score
 
       # === Item details (show page) metadata fields ===
       # Solr fields to be displayed in the show (single result) view.
@@ -350,123 +342,121 @@ class Config::Solr
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      # NOTE: ShowPresenterExt#heading shows :title_display, :subtitle_display,
-      # :linked_title_display, :responsibility_statement_display, and
-      # :linked_responsibility_statement_display so they do not need to be
-      # included here.
+      # ==== Implementation Notes
+      # [1] ShowPresenterExt#heading shows :title_display, :subtitle_display,
+      #     :linked_title_display, :responsibility_statement_display and
+      #     :linked_responsibility_statement_display so they should not be
+      #     included here.
       #
-      #config.add_show_field :title_display,                    label: 'Title'
-      #config.add_show_field :subtitle_display,                 label: 'Subtitle'
-      #config.add_show_field :linked_title_display,             label: 'Title'
-      #config.add_show_field :responsibility_statement_display, label: 'By'
-      config.add_show_field :format_facet,                      label: 'Format',                    helper_method: :format_facet_label
-      config.add_show_field :medium_display,                    label: '[medium_display]'
-      config.add_show_field :part_display,                      label: 'Part'
-      config.add_show_field :journal_title_facet,               label: 'Journal'
-      config.add_show_field :uniform_title_facet,               label: 'Uniform Title'
-      config.add_show_field :alternate_form_title_facet,        label: 'Other Title(s)'
-      config.add_show_field :series_title_facet,                label: 'Series'
-      #config.add_show_field :collection_title_display,         label: 'Digital Collection' # NOTE: seems to be the same as :digital_collection_facet
-      config.add_show_field :digital_collection_facet,          label: 'Digital Collection'
-      config.add_show_field :degree_display,                    label: 'Degree'
-      config.add_show_field :recording_type_facet,              label: 'Recording Type'
-      config.add_show_field :music_composition_form_facet,      label: 'Composition Form'
-      config.add_show_field :music_catagory_facet,              label: 'Music Category'
-      config.add_show_field :mus_display,                       label: '[mus_display]'
-      config.add_show_field :video_genre_facet,                 label: 'Film Genre'
-      config.add_show_field :genre_facet,                       label: 'Genre'
-      #config.add_show_field :date_coverage_display,            label: 'Date' # NOTE: seems to be the same as :published_date_display
-      config.add_show_field :published_date_display,            label: 'Date'
-      config.add_show_field :language_facet,                    label: 'Language'
-      config.add_show_field :langauge_facet,                    label: 'Language'
-      config.add_show_field :media_resource_id_display,         label: 'Type'
-      config.add_show_field :published_display,                 label: 'Published'
-      #config.add_show_field :cre_display,                      label: 'Creators' # NOTE: seems to be the same as :author_facet
-      config.add_show_field :author_facet,                      label: 'Creators'
-      config.add_show_field :release_date_facet,                label: 'Release Date'
-      config.add_show_field :duration_display,                  label: 'Duration'
-      config.add_show_field :video_run_time_display,            label: 'Running Time'
-      config.add_show_field :video_rating_facet,                label: 'Rating'
-      config.add_show_field :video_director_facet,              label: 'Director'
-      config.add_show_field :accession_display,                 label: 'Accession Number'
-      config.add_show_field :denomination_display,              label: 'Denomination'
-      config.add_show_field :collection_facet,                  label: 'Collection'
-      config.add_show_field :abstract_display,                  label: 'Abstract'
-      config.add_show_field :description_note_display,          label: 'Description Note'
-      config.add_show_field :title_added_entry_display,         label: 'Contents'
-      config.add_show_field :toc_display,                       label: 'Table of Contents'
-      config.add_show_field :note_display,                      label: 'Note'
-      config.add_show_field :subject_facet,                     label: 'Subject'
-      config.add_show_field :topic_form_genre_facet,            label: 'Topic Form Genre'
-      config.add_show_field :subject_era_facet,                 label: 'Subject Era'
-      config.add_show_field :region_facet,                      label: 'Geographic Region'
-      config.add_show_field :media_description_display,         label: 'Media Description'
-      config.add_show_field :media_retrieval_id_facet,          label: 'Media Retrieval ID'
-      config.add_show_field :isbn_display,                      label: 'ISBN'
-      config.add_show_field :issn_display,                      label: 'ISSN'
-      config.add_show_field :oclc_display,                      label: 'OCLC'
-      config.add_show_field :upc_display,                       label: 'UPC'
-      config.add_show_field :url_display,                       label: 'Access Online',               helper_method: :url_link
-      config.add_show_field :library_facet,                     label: 'Library'
-      config.add_show_field :location_facet,                    label: 'Location'
-      config.add_show_field :location2_facet,                   label: '[location2_facet]'
-      config.add_show_field :unit_display,                      label: 'Unit'
-      config.add_show_field :url_supp_display,                  label: 'Other Resources',             helper_method: :url_link
-      config.add_show_field :call_number_display,               label: 'Call Number'
-      config.add_show_field :call_number_orig_display,          label: '[call_number_orig]'
-      config.add_show_field :call_number_facet,                 label: '[call_number_facet]'
-      config.add_show_field :call_number_sort_facet,            label: '[call_number_sort_facet]'
-      config.add_show_field :lc_call_number_display,            label: '[lc_call_number_display]'
-      config.add_show_field :shelfkey,                          label: '[shelfkey]'
-      config.add_show_field :reverse_shelfkey,                  label: '[reverse_shelfkey]'
-      config.add_show_field :use_facet,                         label: 'Permissions'
-      config.add_show_field :license_class_facet,               label: 'License'
-      config.add_show_field :terms_of_use_display,              label: 'Terms of Use'
-      config.add_show_field :summary_holdings_display,          label: '[summary_holdings]'
-      config.add_show_field :published_date_facet,              label: '[published_date_facet]'
-      config.add_show_field :shadowed_location_facet,           label: '[shadowed_location]'
-      config.add_show_field :alternate_id_facet,                label: '[alternate_id_facet]'
-      config.add_show_field :doc_type_facet,                    label: '[doc_type_facet]'
-      config.add_show_field :content_model_facet,               label: '[content_model]'
-      config.add_show_field :content_type_facet,                label: '[content_type]'
-      config.add_show_field :feature_facet,                     label: '[feature_facet]'
-      config.add_show_field :individual_call_number_display,    label: '[individual_call_number]'
-      config.add_show_field :iiif_presentation_metadata_display,label: '[iiif_presentation_metadata]'
-      config.add_show_field :rights_wrapper_display,            label: '[rights_wrapper_display]'
-      config.add_show_field :rights_wrapper_url_display,        label: '[rights_wrapper_url]',        helper_method: :url_link
-      config.add_show_field :rs_uri_display,                    label: '[rs_uri]',                    helper_method: :url_link
-      config.add_show_field :pdf_url_display,                   label: '[pdf_url]',                   helper_method: :url_link
-      config.add_show_field :avalon_url_display,                label: '[avalon_url]'
-      config.add_show_field :part_pid_display,                  label: '[part_pid]'
-      config.add_show_field :part_label_display,                label: '[part_label]'
-      config.add_show_field :part_duration_display,             label: '[part_duration]'
-      config.add_show_field :issued_date_display,               label: '[issued_date]'
-      config.add_show_field :created_date_display,              label: '[created_date]'
-      config.add_show_field :breadcrumbs_display,               label: '[breadcrumbs_display]'
-      config.add_show_field :hierarchy_level_display,           label: '[hierarchy_level]'
-      config.add_show_field :hierarchy_display,                 label: '[hierarchy_display]'
-      config.add_show_field :full_hierarchy_display,            label: '[full_hierarchy]'
-      config.add_show_field :pbcore_display,                    label: '[pbcore_display]'
-      config.add_show_field :scope_content_display,             label: '[scope_content]'
-      config.add_show_field :repository_address_display,        label: '[repository_address]'
-      config.add_show_field :datafile_name_display,             label: '[datafile_name]'
-      config.add_show_field :admin_meta_file_display,           label: '[admin_meta]'
-      config.add_show_field :desc_meta_file_display,            label: '[desc_meta]'
-      config.add_show_field :raw_ead_display,                   label: '[raw_ead_display]'
-      config.add_show_field :source_facet,                      label: '[source_facet]'
-      config.add_show_field :barcode_facet,                     label: '[barcode_facet]'
-      config.add_show_field :fund_code_facet,                   label: '[fund_code_facet]'
-      config.add_show_field :date_first_indexed_facet,          label: '[date_first_indexed]'
-      config.add_show_field :timestamp,                         label: '[timestamp]'
-      config.add_show_field :date_indexed_facet,                label: '[date_indexed_facet]'
-      config.add_show_field :id,                                label: '[id]'
-      config.add_show_field :score,                             label: '[score]'
+      # [2] :collection_title_display appears to have the same value as
+      #     :digital_collection_facet so they do not both need to be included.
       #
-      # End by supplying options that apply to multiple field configurations.
+      # [3] :date_coverage_display appears to have the same value as
+      #     :published_date_display so they do not both need to be included.
       #
-      config.show_fields.each_pair do |_, field_def|
-        field_def[:separator_options] = HTML_LINES
-      end
+      # [4] :cre_display appears to have the same value as :author_facet so
+      #     they do not both need to be included.
+
+      config.add_show_field :format_facet, helper_method: :format_facet_label
+      config.add_show_field :medium_display
+      config.add_show_field :recording_format_facet
+      config.add_show_field :part_display
+      config.add_show_field :journal_title_facet
+      config.add_show_field :uniform_title_facet
+      config.add_show_field :alternate_form_title_facet
+      config.add_show_field :series_title_facet
+      config.add_show_field :digital_collection_facet
+      config.add_show_field :degree_display
+      config.add_show_field :recording_type_facet
+      config.add_show_field :music_composition_form_facet
+      config.add_show_field :music_catagory_facet
+      config.add_show_field :mus_display
+      config.add_show_field :video_genre_facet
+      config.add_show_field :genre_facet
+      config.add_show_field :published_date_display
+      config.add_show_field :language_facet
+      config.add_show_field :langauge_facet
+      config.add_show_field :media_resource_id_display
+      config.add_show_field :published_display
+      config.add_show_field :author_facet
+      config.add_show_field :release_date_facet
+      config.add_show_field :duration_display
+      config.add_show_field :video_run_time_display
+      config.add_show_field :video_rating_facet
+      config.add_show_field :video_director_facet
+      config.add_show_field :accession_display
+      config.add_show_field :denomination_display
+      config.add_show_field :collection_facet
+      config.add_show_field :abstract_display
+      config.add_show_field :description_note_display
+      config.add_show_field :title_added_entry_display
+      config.add_show_field :toc_display
+      config.add_show_field :note_display
+      config.add_show_field :subject_facet
+      config.add_show_field :topic_form_genre_facet
+      config.add_show_field :subject_era_facet
+      config.add_show_field :region_facet
+      config.add_show_field :media_description_display
+      config.add_show_field :media_retrieval_id_facet
+      config.add_show_field :isbn_display
+      config.add_show_field :issn_display
+      config.add_show_field :oclc_display
+      config.add_show_field :upc_display
+      config.add_show_field :url_display, helper_method: :url_link
+      config.add_show_field :library_facet
+      config.add_show_field :location_facet
+      config.add_show_field :location2_facet
+      config.add_show_field :unit_display
+      config.add_show_field :url_supp_display, helper_method: :url_link
+      config.add_show_field :call_number_display
+      config.add_show_field :call_number_orig_display
+      config.add_show_field :call_number_facet
+      config.add_show_field :call_number_sort_facet
+      config.add_show_field :lc_call_number_display
+      config.add_show_field :shelfkey
+      config.add_show_field :reverse_shelfkey
+      config.add_show_field :use_facet
+      config.add_show_field :license_class_facet
+      config.add_show_field :terms_of_use_display
+      config.add_show_field :summary_holdings_display
+      config.add_show_field :published_date_facet
+      config.add_show_field :shadowed_location_facet
+      config.add_show_field :alternate_id_facet
+      config.add_show_field :doc_type_facet
+      config.add_show_field :content_model_facet
+      config.add_show_field :content_type_facet
+      config.add_show_field :feature_facet
+      config.add_show_field :individual_call_number_display
+      config.add_show_field :iiif_presentation_metadata_display
+      config.add_show_field :rights_wrapper_display
+      config.add_show_field :rights_wrapper_url_display, helper_method: :url_link
+      config.add_show_field :rs_uri_display,  helper_method: :url_link
+      config.add_show_field :pdf_url_display, helper_method: :url_link
+      config.add_show_field :avalon_url_display
+      config.add_show_field :part_pid_display
+      config.add_show_field :part_label_display
+      config.add_show_field :part_duration_display
+      config.add_show_field :issued_date_display
+      config.add_show_field :created_date_display
+      config.add_show_field :breadcrumbs_display
+      config.add_show_field :hierarchy_level_display
+      config.add_show_field :hierarchy_display
+      config.add_show_field :full_hierarchy_display
+      config.add_show_field :pbcore_display
+      config.add_show_field :scope_content_display
+      config.add_show_field :repository_address_display
+      config.add_show_field :datafile_name_display
+      config.add_show_field :admin_meta_file_display
+      config.add_show_field :desc_meta_file_display
+      config.add_show_field :raw_ead_display
+      config.add_show_field :source_facet
+      config.add_show_field :barcode_facet
+      config.add_show_field :fund_code_facet
+      config.add_show_field :date_first_indexed_facet
+      config.add_show_field :timestamp
+      config.add_show_field :date_indexed_facet
+      config.add_show_field :id
+      config.add_show_field :score
 
       # === Search fields ===
       # "Fielded" search configuration. Used by pulldown among other places.
@@ -501,118 +491,82 @@ class Config::Solr
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      # NOTE: "All Fields" is intentionally placed last.
+      # ==== Implementation Notes
+      # "All Fields" is intentionally placed last.
 
-      # "Title" search selection.
       config.add_search_field(:title) do |field|
         field.solr_local_parameters = {
           #'spellcheck.dictionary': 'title', # TODO: ?
-          #qf: '${qf_title}', # TODO: Solr 7.x
-          #pf: '${pf_title}', # TODO: Solr 7.x
-          qf: '$qf_title',
-          pf: '$pf_title',
+          qf: '$qf_title', #qf: '${qf_title}', # TODO: Solr 7.x
+          pf: '$pf_title', #pf: '${pf_title}', # TODO: Solr 7.x
         }
       end
 
-      # "Author" search selection.
       config.add_search_field(:author) do |field|
         field.solr_local_parameters = {
           #'spellcheck.dictionary': 'author', # TODO: ?
-          #qf: '${qf_author}', # TODO: Solr 7.x
-          #pf: '${pf_author}', # TODO: Solr 7.x
-          qf: '$qf_author',
-          pf: '$pf_author',
+          qf: '$qf_author', #qf: '${qf_author}', # TODO: Solr 7.x
+          pf: '$pf_author', #pf: '${pf_author}', # TODO: Solr 7.x
         }
       end
 
-      # "Subject" search selection.
       config.add_search_field(:subject) do |field|
         field.solr_local_parameters = {
           #'spellcheck.dictionary': 'subject', # TODO: ?
-          #qf: '${qf_subject}', # TODO: Solr 7.x
-          #pf: '${pf_subject}', # TODO: Solr 7.x
-          qf: '$qf_subject',
-          pf: '$pf_subject',
+          qf: '$qf_subject', #qf: '${qf_subject}', # TODO: Solr 7.x
+          pf: '$pf_subject', #pf: '${pf_subject}', # TODO: Solr 7.x
         }
       end
 
-      # "Journal Title" search selection.
       config.add_search_field(:journal) do |field|
-        field.label = 'Journal Title'
         field.solr_local_parameters = {
-          #qf: '${qf_journal_title}', # TODO: Solr 7.x
-          #pf: '${pf_journal_title}', # TODO: Solr 7.x
-          qf: '$qf_journal_title',
-          pf: '$pf_journal_title',
+          #'spellcheck.dictionary': 'journal', # TODO: ?
+          qf: '$qf_journal_title', #qf: '${qf_journal_title}', # TODO: Solr 7.x
+          pf: '$pf_journal_title', #pf: '${pf_journal_title}', # TODO: Solr 7.x
         }
       end
 
-      # "Keywords" search selection. # TODO: testing?
-      config.add_search_field(:keyword) do |field|
-        field.label = 'Keywords'
+      config.add_search_field(:keyword) do |field| # TODO: testing - remove?
         field.solr_local_parameters = {
-          #qf: '${qf_keyword}', # TODO: Solr 7.x
-          #pf: '${pf_keyword}', # TODO: Solr 7.x
-          qf: '$qf_keyword',
-          pf: '$pf_keyword',
+          #'spellcheck.dictionary': 'keyword', # TODO: ?
+          qf: '$qf_keyword', #qf: '${qf_keyword}', # TODO: Solr 7.x
+          pf: '$pf_keyword', #pf: '${pf_keyword}', # TODO: Solr 7.x
         }
       end
 
-      # "Call Number" search selection. # TODO: testing?
-      config.add_search_field(:call_number) do |field|
-        field.label = 'Call Number'
+      config.add_search_field(:call_number) do |field| # TODO: testing - remove?
         field.solr_local_parameters = {
-          #qf: '${qf_call_number}', # TODO: Solr 7.x
-          #pf: '${pf_call_number}', # TODO: Solr 7.x
-          qf: '$qf_call_number',
-          pf: '$pf_call_number',
+          #'spellcheck.dictionary': 'call_number', # TODO: ?
+          qf: '$qf_call_number', #qf: '${qf_call_number}', # TODO: Solr 7.x
+          pf: '$pf_call_number', #pf: '${pf_call_number}', # TODO: Solr 7.x
         }
       end
 
-      # "Publisher" search selection. # TODO: testing?
-      config.add_search_field(:published) do |field|
-        field.label = 'Publisher Name/Place'
+      config.add_search_field(:published) do |field| # TODO: testing - remove?
         field.solr_local_parameters = {
-          #qf: '${qf_published}', # TODO: Solr 7.x
-          #pf: '${pf_published}', # TODO: Solr 7.x
-          qf: '$qf_published',
-          pf: '$pf_published',
+          #'spellcheck.dictionary': 'published', # TODO: ?
+          qf: '$qf_published', #qf: '${qf_published}', # TODO: Solr 7.x
+          pf: '$pf_published', #pf: '${pf_published}', # TODO: Solr 7.x
         }
       end
 
-      # "Publisher" search selection. # TODO: testing?
-      config.add_search_field(:publication_date) do |field|
-        field.label = 'Year Published'
-        field.range = 'true'
+      config.add_search_field(:publication_date) do |field| # TODO: testing - remove?
+        field.range      = 'true'
         field.solr_field = 'year_multisort_i'
       end
 
-      # "ISSN" search selection. # TODO: testing?
-      config.add_search_field(:issn) do |field|
-        field.label = 'ISSN'
+      config.add_search_field(:issn) do |field| # TODO: testing - remove?
         field.solr_local_parameters = {
-          #qf: '${qf_issn}', # TODO: Solr 7.x
-          #pf: '${pf_issn}', # TODO: Solr 7.x
-          qf: '$qf_issn',
-          pf: '$pf_issn',
+          qf: '$qf_issn', #qf: '${qf_issn}', # TODO: Solr 7.x
+          pf: '$pf_issn', #pf: '${pf_issn}', # TODO: Solr 7.x
         }
-=begin
-        field.include_in_advanced_search = false
-=end
       end
 
-      # "ISBN" search selection. # TODO: testing?
-      config.add_search_field(:isbn) do |field|
-        field.label = 'ISBN'
+      config.add_search_field(:isbn) do |field| # TODO: testing - remove?
         field.solr_local_parameters = {
-          #qf: '${qf_isbn}', # TODO: Solr 7.x
-          #pf: '${pf_isbn}', # TODO: Solr 7.x
-          qf: '$qf_isbn',
-          pf: '$pf_isbn',
+          qf: '$qf_isbn', #qf: '${qf_isbn}', # TODO: Solr 7.x
+          pf: '$pf_isbn', #pf: '${pf_isbn}', # TODO: Solr 7.x
         }
-=begin
-        field.include_in_advanced_search = false
-=end
       end
 
       # "All Fields" search selection is intentionally placed last so that the
@@ -620,22 +574,20 @@ class Config::Solr
       # before falling-back on a generic keyword search.  It is indicated as
       # "default" only to ensure that other search types are properly labeled
       # in search constraints and history.
-      config.add_search_field :all_fields, label: 'All Fields', default: true
+      config.add_search_field :all_fields, default: true
 
       # === Sort fields ===
-      #
       # "Sort results by" select (pulldown)
-      #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
-      #
-      config.add_sort_field :relevance,       sort: BY_RELEVANCE,       label: 'Relevance'
-      config.add_sort_field :received,        sort: BY_RECEIVED_DATE,   label: 'Date Received'
-      config.add_sort_field :newest,          sort: BY_NEWEST,          label: 'Date Published (newest)'
-      config.add_sort_field :oldest,          sort: BY_OLDEST,          label: 'Date Published (oldest)'
-      config.add_sort_field :title,           sort: IN_TITLE_ORDER,     label: 'Title'
-      config.add_sort_field :author,          sort: IN_AUTHOR_ORDER,    label: 'Author'
-      config.add_sort_field :call_number,     sort: IN_SHELF_ORDER,     label: 'Call Number'
-      config.add_sort_field :call_number_rev, sort: IN_REV_SHELF_ORDER, label: 'Call Number (reverse)'
+
+      config.add_sort_field :relevance,       sort: BY_RELEVANCE
+      config.add_sort_field :received,        sort: BY_RECEIVED_DATE
+      config.add_sort_field :newest,          sort: BY_NEWEST
+      config.add_sort_field :oldest,          sort: BY_OLDEST
+      config.add_sort_field :title,           sort: IN_TITLE_ORDER
+      config.add_sort_field :author,          sort: IN_AUTHOR_ORDER
+      config.add_sort_field :call_number,     sort: IN_SHELF_ORDER
+      config.add_sort_field :call_number_rev, sort: IN_REV_SHELF_ORDER
 
       # === Blacklight behavior configuration ===
 
@@ -676,25 +628,30 @@ class Config::Solr
       config.advanced_search.query_parser         ||= 'dismax'
       config.advanced_search.form_solr_parameters ||= {}
 =begin
-    config.advanced_search = Blacklight::OpenStructWithHashAccess.new(
-      qt:           'search',
-      url_key:      'advanced',
-      query_parser: 'dismax',
-      form_solr_parameters: {
-        'facet.field': %w(
-          format
-          pub_date
-          subject_topic_facet
-          language_facet
-          lc_alpha_facet
-          subject_geo_facet
-          subject_era_facet
-        ),
-        'facet.limit': -1,     # return all facet values
-        'facet.sort':  'index' # sort by byte order of values
-      }
-    )
+      config.advanced_search = Blacklight::OpenStructWithHashAccess.new(
+        qt:           'search',
+        url_key:      'advanced',
+        query_parser: 'dismax',
+        form_solr_parameters: {
+          'facet.field': %w(
+            format
+            pub_date
+            subject_topic_facet
+            language_facet
+            lc_alpha_facet
+            subject_geo_facet
+            subject_era_facet
+          ),
+          'facet.limit': -1,     # return all facet values
+          'facet.sort':  'index' # sort by byte order of values
+        }
+      )
 =end
+
+      # === Localization ===
+      # Get field labels from I18n, including labels specific to this lens.
+
+      finalize_configuration(config)
 
     end
   end

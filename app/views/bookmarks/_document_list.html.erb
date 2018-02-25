@@ -1,6 +1,6 @@
 <%# app/views/bookmarks/_document_list.html.erb -%>
 <%-
-  # NOTE: Added to render each type of document separately according to its presenter
+  # Renders each document type according to its own presenter.
   docs = document_list ||= @document_list
   return unless docs.present?
 
@@ -10,7 +10,7 @@
 <div id="documents" class="documents-<%= document_index_view_type %>">
   <%- docs.each_with_index do |doc, counter| -%>
     <%- opt = { document: doc, document_counter: counter } -%>
-    <%- key = doc.is_a?(EdsDocument) ? :articles : :catalog -%>
+    <%- key = lens_key_for(doc) -%>
     <%- controller[key] ||= lens_for(key).instance(@response, request) -%>
     <%= controller[key].instance_exec(opt) do |opt| -%>
       <%- view_context.render('document', opt) -%>

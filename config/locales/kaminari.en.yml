@@ -11,6 +11,10 @@ en:
       next:             'Next &raquo;'
       truncate:         '…'                       # original: '&hellip;'
 
+    pagination_compact:
+      previous:         '&laquo;&thinsp;Prev'     # was: '&laquo; Previous'
+      next:             'Next&thinsp;&raquo;'     # was: 'Next &raquo;'
+
   helpers:
 
     page_entries_info:

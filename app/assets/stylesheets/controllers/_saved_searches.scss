@@ -1,12 +1,15 @@
 // app/assets/stylesheets/controllers/_saved_searches.scss
 
+@import 'shared/history';
+
 //=============================================================================
 // Saved Searches page
 //=============================================================================
 
-.saved_searches {
-    // Align action buttons under the "Clear" button.
-    .actions {
-        text-align: right;
+body.blacklight-saved_searches {
+
+    .search_history .search-type .label {
+        width: 75%;
     }
+
 }

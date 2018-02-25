@@ -1,28 +1,20 @@
 <%# app/views/advanced/_advanced_search_submit_btns.html.erb -%>
 <%-
+  lens ||= current_lens_key
 
-  in_articles =
-    request.path.include?('/articles/') || request.path.end_with?('/articles')
+  sort_label   = t('blacklight_advanced_search.form.sort_label')
+  sort_value   = current_sort_field&.key.to_s
+  sort_menu    = options_for_select(sort_fields, h(sort_value))
 
-  sort_label  = t('blacklight_advanced_search.form.sort_label')
-  sort_value  = current_sort_field&.key.to_s
-  sort_menu   = options_for_select(sort_fields, h(sort_value))
+  adv_key      = blacklight_config.advanced_search[:url_key]
 
-  adv_key     = blacklight_config.advanced_search[:url_key]
-
-  clear_label = t('blacklight_advanced_search.form.start_over')
-  clear_class = 'btn btn-default advanced-search-start-over'
-  clear_path  =
-    if in_articles
-      articles_advanced_search_path
-    else
-      catalog_advanced_search_path
-    end
+  clear_label  = t('blacklight_advanced_search.form.start_over')
+  clear_path   = advanced_search_path(lens)
+  clear_opt    = { class: 'btn btn-default advanced-search-start-over' }
 
   submit_label = t('blacklight_advanced_search.form.search_btn')
   submit_class = 'btn btn-primary advanced-search-submit'
   submit_opt   = { id: 'advanced-search-submit', class: submit_class }
-
 -%>
 <div class="sort-buttons pull-left">
   <%= label_tag(:sort, sort_label, class: 'control-label') %>
@@ -31,6 +23,6 @@
   <%= hidden_field_tag(:controller, default_catalog_controller) %>
 </div>
 <div class="submit-buttons pull-right">
-  <%= link_to clear_label, clear_path, class: clear_class %>
+  <%= link_to clear_label, clear_path, clear_opt %>
   <%= submit_tag submit_label, submit_opt %>
 </div>

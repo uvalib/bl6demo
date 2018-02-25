@@ -1,0 +1,10 @@
+<%# app/views/music/_announcements.html.erb -%>
+<%-
+  # Music lens announcements.
+  items = [ # TODO: testing; remove
+    'First music announcement...',
+    'Second music announcement...',
+    'Third music announcement...'
+  ]
+-%>
+<%= render 'shared/announcements', announcements: items %>

@@ -30,23 +30,25 @@ module Config
     # "lib.virginia.edu" then the real configuration will be used.  Otherwise,
     # the "fake" (local Solr) configuration will be used.
     #
-    # @param [Blacklight::Configuration, nil] config
-    #
     # @see Config::Solr#instance
     # @see Config::SolrFake#instance
     #
-    def initialize(config = nil)
-      config ||=
-        if Blacklight.connection_config[:url].include?('lib.virginia.edu')
-          CATALOG_CONFIG
-        else
-          require_relative('_solr_fake')
-          SolrFake.instance
-        end
-      super(:catalog, config)
+    def initialize
+      if Blacklight.connection_config[:url].include?('lib.virginia.edu')
+        super(CATALOG_CONFIG)
+      else
+        require_relative('_solr_fake')
+        super(Config::SolrFake.instance)
+      end
     end
 
   end
+
+  # Assign class lens key.
+  Catalog.key = CATALOG_CONFIG.lens_key
+
+  # Sanity check.
+  abort unless Blacklight::Lens::LENS_KEYS.include?(Catalog.key)
 
 end
 

@@ -1,13 +1,12 @@
 <%# app/views/shared/_header_navbar.html.erb -%>
 <%-
-  logo = link_to(h(application_name), root_path)
-  lens = (lens_key unless request.path == root_path)
-  lens =
-    if Blacklight::Lens.valid_key?(lens)
+  logo ||= link_to(h(application_name), root_path)
+  lens ||= current_lens_key
+  lens &&=
+    if request.path.start_with?("/#{lens}")
       label = h(lens.to_s.capitalize)
       path  = send("search_#{lens}_path")
-      link  = link_to(label, path, class: 'navbar-lens')
-      " &ndash; #{link}".html_safe
+      ' &ndash; '.html_safe << link_to(label, path, class: 'navbar-lens')
     end
 -%>
 

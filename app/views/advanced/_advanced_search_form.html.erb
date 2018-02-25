@@ -1,12 +1,10 @@
 <%# app/views/advanced/_advanced_form.html.erb -%>
 <%-
-
-  in_articles =
-    request.path.include?('/articles/') || request.path.end_with?('/articles')
+  lens ||= current_lens_key
 
   search_context_str = render_search_to_s(advanced_search_context).presence
 
-  search_path = in_articles ? search_articles_path : search_catalog_path
+  search_path = search_path(lens)
   search_opt  = { class: 'advanced form-horizontal', method: :get }
 
   hidden_fields = search_state.params_for_search(advanced_search_context)
@@ -18,7 +16,6 @@
   and_that_have =
     t('blacklight_advanced_search.form.limit_criteria_heading_html')
 
-  lens = in_articles ? :articles : :catalog
   bl_config = blacklight_config(lens)
   form_facet_partial = bl_config.advanced_search&.form_facet_partial
 

@@ -1,0 +1,10 @@
+<%# app/views/video/_announcements.html.erb -%>
+<%-
+  # Video lens announcements.
+  items = [ # TODO: testing; remove
+    'First video announcement...',
+    'Second video announcement...',
+    'Third video announcement...'
+  ]
+-%>
+<%= render 'shared/announcements', announcements: items %>

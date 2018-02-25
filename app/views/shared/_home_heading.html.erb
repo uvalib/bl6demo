@@ -1,6 +1,9 @@
 <%# app/views/shared/_home_heading.html.erb -%>
 <%-
-  heading ||= t('blacklight.welcome')
+  # The heading at the top of each lens home page.
+  lens    ||= current_lens_key
+  heading ||= t("blacklight.#{lens}.welcome", default: :'blacklight.welcome')
+  @page_title = t("blacklight.#{lens}.page_title", default: heading)
 
   total_cols = 12
   head_cols  = 7
@@ -10,8 +13,8 @@
     'All'      => root_path,
     'Catalog'  => search_catalog_path,
     'Articles' => search_articles_path,
-    'Video'    => root_path, # TODO: search_video_path,
-    'Music'    => root_path, # TODO: search_music_path,
+    'Video'    => search_video_path,
+    'Music'    => search_music_path,
   }.map { |label, url|
     next unless url
     label ||= url

@@ -44,10 +44,12 @@ module LensConcern
 
     # The (potential) lens key for the current controller.
     #
-    # @return [Symbol]
+    # @return [Symbol, nil]
+    #
+    # NOTE: 0% coverage for this method
     #
     def lens_key
-      controller_name.to_sym
+      Blacklight::Lens.key_for(controller_name, false)
     end
 
     # =========================================================================
@@ -58,10 +60,10 @@ module LensConcern
 
     # The (potential) lens key for the current controller class.
     #
-    # @return [Symbol]
+    # @return [Symbol, nil]
     #
     def self.lens_key
-      controller_name.to_sym
+      Blacklight::Lens.key_for(controller_name, false)
     end
 
   end

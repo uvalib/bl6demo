@@ -1,21 +1,10 @@
 <%# app/views/catalog/_announcements.html.erb -%>
 <%-
   # Catalog lens announcements.
-  announcements ||= nil
-  announcements = [ # TODO: testing; remove
+  items = [ # TODO: testing; remove
     'FIRST...',
     'SECOND...',
     'THIRD...'
   ]
-  return unless announcements.present?
-  id      ||= 'announcements'
-  heading ||= 'Announcements about catalog search' # TODO: I18n
-  item_list =
-    announcements.map { |item|
-      content_tag(:li, h(item)) if item.present?
-    }.compact.join("\n").html_safe
 -%>
-<div id="<%= id %>">
-  <h3 class='section-heading'><%= heading %></h3>
-  <ul><%= item_list %></ul>
-</div>
+<%= render 'shared/announcements', announcements: items %>

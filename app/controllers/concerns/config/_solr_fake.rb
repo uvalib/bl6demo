@@ -5,11 +5,12 @@
 
 __loading_begin(__FILE__)
 
-require_relative '_constants'
+require_relative '_common'
 
 class Config::SolrFake
 
-  include Config::Constants
+  # Default Blacklight Lens for controllers based on this configuration.
+  SOLR_DEFAULT_LENS = :catalog
 
   # ===========================================================================
   # :section:
@@ -31,6 +32,12 @@ class Config::SolrFake
       $stderr.puts('ERROR: ' + alert)
     end
     @instance ||= Blacklight::Configuration.new do |config|
+
+      include Config::Common
+      extend  Config::Common
+
+      # Default Blacklight Lens for controllers based on this configuration.
+      config.lens_key = SOLR_DEFAULT_LENS
 
       # === Search request configuration ===
 
@@ -102,35 +109,30 @@ class Config::SolrFake
       #config.connection_config = ...
 
       # === Configuration for navbar ===
-      #
       # @see Blacklight::Configuration#add_nav_action
-      #
+
       #config.navbar = OpenStructWithHashAccess.new(partials: {})
 
       # === Configuration for search results/index views ===
-      #
       # @see Blacklight::Configuration::ViewConfig::Index
-      #
+
       config.index.document_presenter_class = Blacklight::IndexPresenterExt
       config.index.display_type_field = :format
       config.index.title_field        = :title_display
-      #config.index.thumbnail_field    = :thumbnail_path_ss
+      #config.index.thumbnail_field   = :thumbnail_path_ss
 
       # === Configuration for document/show views ===
-      #
       # @see Blacklight::Configuration::ViewConfig::Show
-      #
+
       config.show.document_presenter_class = Blacklight::ShowPresenterExt
       config.show.display_type_field  = :format
       config.show.title_field         = :title_display
-      #config.show.thumbnail_field     = :thumbnail_path_ss
-      config.show.route               = { controller: :catalog }
+      #config.show.thumbnail_field    = :thumbnail_path_ss
       config.show.partials            = [:show_header, :thumbnail, :show]
 
       # === Configurations for specific types of index views ===
-      #
       # @see Blacklight::Configuration#view_config
-      #
+
       #config.view =
       #  Blacklight::NestedOpenStructWithHashAccess.new(
       #    Blacklight::Configuration::ViewConfig,
@@ -176,7 +178,7 @@ class Config::SolrFake
       # values).
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
-      #
+
       config.add_facet_field :format,              label: 'Format'
       config.add_facet_field :pub_date,            label: 'Publication Year', single: true
       config.add_facet_field :subject_topic_facet, label: 'Topic',            limit:  20,   index_range: 'A'..'Z'
@@ -205,9 +207,10 @@ class Config::SolrFake
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      # NOTE: IndexPresenterExt#label displays :title_display.
-      #
-      #config.add_index_field :title_display,          label: 'Title'
+      # ==== Implementation Notes
+      # [1] IndexPresenterExt#heading shows :title_display so it does not need
+      #     to be included here.
+
       config.add_index_field :title_vern_display,     label: 'Title'
       config.add_index_field :author_display,         label: 'Author'
       config.add_index_field :author_vern_display,    label: 'Author'
@@ -223,11 +226,11 @@ class Config::SolrFake
       #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
-      # NOTE: ShowPresenterExt#heading shows :title_display, :subtitle_display,
-      # :linked_title_display, :responsibility_statement_display, and
-      # :linked_responsibility_statement_display so they do not need to be
-      # included here.
-      #
+      # ==== Implementation Notes
+      # [1] ShowPresenterExt#heading shows :title_display, :title_vern_display,
+      #     :subtitle_display, :subtitle_vern_display, :author_display,, and
+      #     :author_vern_display so they do not need to be included here.
+
       #config.add_show_field :title_display,           label: 'Title'
       #config.add_show_field :title_vern_display,      label: 'Title'
       #config.add_show_field :subtitle_display,        label: 'Subtitle'
@@ -321,11 +324,9 @@ class Config::SolrFake
       config.add_search_field :all_fields, label: 'All Fields', default: true
 
       # === Sort fields ===
-      #
       # "Sort results by" select (pulldown)
-      #
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
-      #
+
       config.add_sort_field :relevance,  sort: 'score desc, pub_date_sort desc, title_sort asc', label: 'Relevance'
       config.add_sort_field :newest,     sort: 'pub_date_sort desc, title_sort    asc',          label: 'Date'
       config.add_sort_field :oldest,     sort: 'pub_date_sort desc, title_sort    desc',         label: 'Date (oldest first)'

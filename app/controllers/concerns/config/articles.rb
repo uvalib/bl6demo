@@ -26,16 +26,19 @@ module Config
 
     # Initialize a self instance.
     #
-    # @param [Blacklight::Configuration, nil] config
-    #
     # @see Config::Eds#instance
     #
-    def initialize(config = nil)
-      config ||= ARTICLES_CONFIG
-      super(:articles, config)
+    def initialize
+      super(ARTICLES_CONFIG)
     end
 
   end
+
+  # Assign class lens key.
+  Articles.key = ARTICLES_CONFIG.lens_key
+
+  # Sanity check.
+  abort unless Blacklight::Lens::LENS_KEYS.include?(Articles.key)
 
 end
 

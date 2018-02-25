@@ -23,46 +23,13 @@ module Blacklight
     include Blacklight::LensMapper
     extend  Blacklight::LensMapper
 
-    # @see Blacklight::Configuration
-    CONFIG_METHODS = %i(
-      document_unique_id_param
-      document_pagination_params
-      repository_class
-      search_builder_class
-      response_model
-      document_model
-      facet_paginator_class
-      connection_config
-      navbar
-      index
-      show
-      view
-      spell_max
-      max_per_page
-      per_page
-      default_per_page
-      search_history_window
-      default_facet_limit
-      default_more_limit
-      crawler_detector
-      facet_field
-      index_field
-      show_field
-      search_field
-      sort_field
-      default_search_field
-      default_sort_field
-      default_title_field
-      facet_configuration_for_field
-      add_facet_fields_to_solr_request!
-      add_field_configuration_to_solr_request!
-      deep_copy
-      view_config
-      add_show_tools_partial
-      add_results_collection_tool
-      add_results_document_tool
-      add_nav_action
-    )
+    # Methods to delegate to :blacklight_config.
+    # @see Blacklight::Configuration#default_values
+    # @see Blacklight::Configuration#instance_methods
+    CONFIG_METHODS = (
+      Blacklight::Configuration.default_values.keys +
+      Blacklight::Configuration.instance_methods(false)
+    ).reject { |k| k.blank? || (k =~ /=/) }.map(&:to_sym).sort.uniq.freeze
 
     # =========================================================================
     # :section:

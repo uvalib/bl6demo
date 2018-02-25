@@ -41,30 +41,39 @@ module LensHelper
   #
   # The method will return *nil* only when *obj* does not map to a valid lens.
   #
-  # @param [Object, nil] obj
+  # @param [Object, nil]     obj
+  # @param [Boolean, Symbol] default    Default value: *true*.
   #
   # @raise [RuntimeError]             If the default lens is missing.
   #
   # @return [Blacklight::Lens]
+  # @return [default] If *obj* is invalid and *default* is not a Boolean.
+  # @return [nil]     If *obj* is invalid and *default* is *false*.
   #
-  def lens_for(obj = nil)
-    fallback = current_lens_key
-    obj ||= fallback
-    lens = Blacklight::Lens[obj]
-    unless lens
-      unless Blacklight::Lens.empty?
-        logger.error("Blacklight::Lens#table has no entry for #{obj}")
+  def lens_for(obj = nil, default = true)
+    lens = nil
+    trial_keys = [obj]
+    trial_keys <<
+      case default
+        when true  then default = current_lens_key
+        when false then default = nil
+        else            default
       end
-      obj = Blacklight::Lens.key_for(obj)
-      "config/#{obj}".camelize.constantize.new
-      lens = Blacklight::Lens[obj]
+    trial_keys.map! { |k| Blacklight::Lens.key_for(k, false) if k.present? }
+    trial_keys.compact!
+    trial_keys.uniq!
+    trial_keys.find do |key|
+      lens = Blacklight::Lens[key]
+      lens ||=
+        begin
+          "config/#{key}".camelize.constantize.new # Instantiate configuration.
+          Blacklight::Lens[key]
+        end
     end
-    unless lens # NOTE: 0% coverage for this case
-      obj = fallback
-      logger.error("Blacklight::Lens fallback to #{obj}")
-      lens = Blacklight::Lens[obj]
+    if !lens && default
+      raise("Blacklight::Lens#table has no entry for #{obj || default}")
     end
-    lens || raise("Blacklight::Lens#table has no entry for #{obj}")
+    lens
   end
 
   # The current lens.
@@ -97,11 +106,12 @@ module LensHelper
   # Blacklight::Lens#default_key.
   #
   # @param [Object, nil] obj
+  # @param [Boolean, Symbol] default    Default value: *true*.
   #
   # @return [Symbol]
   #
-  def lens_key_for(obj = nil)
-    Blacklight::Lens.key_for(obj)
+  def lens_key_for(obj = nil, default = true)
+    Blacklight::Lens.key_for(obj, default)
   end
 
   # current_lens_key
@@ -182,6 +192,106 @@ module LensHelper
   def render_template(partial, locals = nil) # TODO: this can probably be eliminated now...
     locals ||= {}
     render(partial, locals)
+  end
+
+  # ===========================================================================
+  # :section:
+  # ===========================================================================
+
+  public
+
+  # Maps lens to Bootstrap label color.
+  LENS_COLOR_CLASS = {
+    catalog:  'info',
+    articles: 'warning',
+    video:    'success',
+    music:    'primary'
+  }
+
+  # A Bootstrap label used to identify the source lens of a history entry or
+  # saved search.
+  #
+  # @param [Symbol, String] type      Lens type.
+  #
+  # @return [ActiveSupport::SafeBuffer]
+  #
+  def search_type_label(type = nil)
+    type ||= current_lens_key
+    type_class = LENS_COLOR_CLASS[type]
+    classes = ['label']
+    classes << "label-#{type_class}" if type_class.present?
+    classes << 'search-type'
+    classes = classes.join(' ')
+    content_tag(:div, type.capitalize, class: classes)
+  end
+
+  # Select the proper polymorphic search path based on the lens.
+  #
+  # @param [Symbol, String, nil] lens
+  # @param [Hash, nil]           opt    Path options.
+  #
+  # @return [String]
+  #
+  def search_path(lens = nil, opt = nil)
+    if lens.is_a?(Hash)
+      opt  = lens
+      lens = nil
+    else
+      opt ||= {}
+    end
+    lens = Blacklight::Lens.key_for(lens, false) || current_lens_key
+    case lens
+      when :catalog  then search_catalog_path(opt)
+      when :articles then search_articles_path(opt)
+      when :video    then search_video_path(opt)
+      when :music    then search_music_path(opt)
+    end
+  end
+
+  # Select the proper polymorphic search path based on the lens.
+  #
+  # @param [Symbol, String, nil] lens
+  # @param [Hash, nil]           opt    Path options.
+  #
+  # @return [String]
+  #
+  def advanced_search_path(lens = nil, opt = nil)
+    if lens.is_a?(Hash)
+      opt  = lens
+      lens = nil
+    else
+      opt ||= {}
+    end
+    lens = Blacklight::Lens.key_for(lens, false) || current_lens_key
+    case lens
+      when :catalog  then catalog_advanced_search_path(opt)
+      when :articles then articles_advanced_search_path(opt)
+      when :video    then video_advanced_search_path(opt)
+      when :music    then music_advanced_search_path(opt)
+    end
+  end
+
+  # Select the proper polymorphic search path based on the lens.
+  #
+  # @param [Symbol, String, nil] lens
+  # @param [Hash, nil]           opt    Path options.
+  #
+  # @return [String]
+  #
+  def suggest_index_path(lens = nil, opt = nil)
+    if lens.is_a?(Hash)
+      opt  = lens
+      lens = nil
+    else
+      opt ||= {}
+    end
+    lens = Blacklight::Lens.key_for(lens, false) || current_lens_key
+    case lens
+      when :catalog  then catalog_suggest_index_path(opt)
+      when :articles then articles_suggest_index_path(opt)
+      when :video    then video_suggest_index_path(opt)
+      when :music    then music_suggest_index_path(opt)
+    end
   end
 
 end

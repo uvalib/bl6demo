@@ -37,20 +37,28 @@ module SolrConcern
       Blacklight::Exceptions::ECONNREFUSED
     ], with: :handle_solr_connect_error
 
-  end
+    # =========================================================================
+    # :section:
+    # =========================================================================
 
-  # ===========================================================================
-  # :section:
-  # ===========================================================================
+    public
 
-  public
+    # The default controller for searches.
+    #
+    # @return [Class]
+    #
+    def default_catalog_controller
+      CatalogController
+    end
 
-  # The default controller for searches.
-  #
-  # @return [Class]
-  #
-  def default_catalog_controller
-    CatalogController
+    # The default controller for searches.
+    #
+    # @return [Class]
+    #
+    def self.default_catalog_controller
+      CatalogController
+    end
+
   end
 
   # ===========================================================================

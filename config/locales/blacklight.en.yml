@@ -2,28 +2,6 @@
 
 en:
 
-  # ===========================================================================
-  # Pagination
-  # NOTE: config/locales/kaminari.en.yml also defines en.views.pagination
-  # ===========================================================================
-
-  views:
-
-    pagination:
-      first:            '&laquo; First'
-      last:             'Last &raquo;'
-      previous:         '&laquo; Previous'
-      next:             'Next &raquo;'
-      truncate:         '…'
-
-    pagination_compact:
-      previous:         '&laquo;&thinsp;Prev'     # was: '&laquo; Previous'
-      next:             'Next&thinsp;&raquo;'     # was: 'Next &raquo;'
-
-  # ===========================================================================
-  # Blacklight
-  # ===========================================================================
-
   blacklight:
 
     application_name:   'Virgo'
@@ -38,41 +16,6 @@ en:
 
     entry_name:
       default:          'entry'
-
-    # =========================================================================
-    # Combined lens
-    # =========================================================================
-
-    all:
-      welcome:          Catalog+Articles Search
-
-    # =========================================================================
-    # Catalog lens
-    # =========================================================================
-
-    catalog:
-      welcome:          Catalog Search
-
-    # =========================================================================
-    # Articles lens
-    # =========================================================================
-
-    articles:
-      welcome:          Articles Search
-
-    # =========================================================================
-    # Video lens
-    # =========================================================================
-
-    video:
-      welcome:          Video Search
-
-    # =========================================================================
-    # Music lens
-    # =========================================================================
-
-    music:
-      welcome:          Music Search
 
     # =========================================================================
     # Nav header
@@ -172,7 +115,7 @@ en:
     bookmarks:
 
       title:            'Bookmarks'
-      page_title:       'Bookmarks - %{application_name}'
+      page_title:       ~ # Erase value supplied by gem in favor of :title.
       list_title:       'Your Bookmarks'
 
       no_bookmarks:     'You have no bookmarks.'
@@ -205,7 +148,7 @@ en:
     saved_searches:
 
       title:            'Saved Searches'
-      page_title:       'Saved Searches - %{application_name}'
+      page_title:       ~ # Erase value supplied by gem in favor of :title.
       list_title:       'Your saved searches'
 
       no_searches:      'You have no saved searches.'
@@ -233,7 +176,7 @@ en:
     search_history:
 
       title:            'Search History'
-      page_title:       'Search History - %{application_name}'
+      page_title:       ~ # Erase value supplied by gem in favor of :title.
       recent:           'Your recent searches'
 
       no_history:       'You have no search history.'

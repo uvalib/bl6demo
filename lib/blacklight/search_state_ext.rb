@@ -135,18 +135,21 @@ module Blacklight
     # This method overrides:
     # @see Blacklight::SearchState#url_for_document
     #
-    def url_for_document(doc, options = nil) # TODO: may not be needed if blacklight_config is not adjusted
+    def url_for_document(doc, options = nil)
       valid = doc.is_a?(Blacklight::Document)
       valid ||=
         doc.respond_to?(:to_model) && doc.to_model.is_a?(Blacklight::Document)
-      if valid && (route = blacklight_config.show.route)
-        opt = { id: doc, action: 'show' }
-        opt.reverse_merge!(options) if options.present?
-        route.merge(opt).tap do |rt|
-          rt[:controller] = params[:controller] if rt[:controller] == :current
-        end
-      else
+      if !valid
         doc
+      elsif (route = blacklight_config.show.route).is_a?(String) # NOTE: 0% coverage for this case
+        url_for([route, id: doc])
+      else
+        path = { controller: current_lens_key, action: 'show', id: doc }
+        path.merge!(route)   if route.is_a?(Hash)
+        path.merge!(options) if options.is_a?(Hash)
+        path[:controller] = nil if path[:controller] == :current
+        path[:controller] ||= params[:controller]
+        path
       end
     end
 

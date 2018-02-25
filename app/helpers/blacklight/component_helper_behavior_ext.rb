@@ -41,8 +41,6 @@ module Blacklight
     end
 =end
 
-=begin # NOTE: using base version
-=end
     # document_action_path
     #
     # @param [?]         action_opts
@@ -58,7 +56,7 @@ module Blacklight
       if action_opts.path
         self.send(action_opts.path, url_opts)
       elsif (id = url_opts[:id]).class.respond_to?(:model_name)
-        url_for([action_opts.key, id])
+        url_for(controller: current_lens_key, action: action_opts.key, id: id)
       else # NOTE: 0% coverage for this case
         controller = default_lens_controller.controller_name
         url_helper = "#{action_opts.key}_#{controller}_path"

@@ -1,13 +1,11 @@
 <%# app/views/catalog/_home.html.erb -%>
 <%-
   # Catalog lens "main page" content.
-  app_home = (request.path == root_path)
-  heading  = t("blacklight.#{current_lens.key}.welcome")
 -%>
-<%- if app_home -%>
+<%- if request.path == root_path -%>
   <%= render 'root/home' %>
 <%- else -%>
-  <%= render 'shared/home_heading', heading: heading %>
+  <%= render 'shared/home_heading' %>
   <%= render 'announcements' %>
   <%= render 'featured' %>
 <%- end -%>

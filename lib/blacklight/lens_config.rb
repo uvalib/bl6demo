@@ -16,10 +16,10 @@ module Blacklight
     # All (known) lens keys.
     LENS_KEYS = [
       #:all,        # TODO: Combined results controller?
-      :articles,
-      #:music,      # TODO: Music controller
-      #:video,      # TODO: Video controller
       :catalog,
+      :articles,
+      :video,
+      :music,
     ].freeze
 
     # Explicitly state the key for the default lens.

@@ -48,7 +48,8 @@ module Blacklight::BlacklightHelperBehaviorExt
     t('blacklight.application_name')
   end
 
-  # Get the page's HTML title
+  # Generate the page's HTML title, which appears in browser history and as the
+  # browser tab label.
   #
   # @return [ActiveSupport::SafeBuffer]
   #
@@ -56,7 +57,15 @@ module Blacklight::BlacklightHelperBehaviorExt
   # @see Blacklight::BlacklightHelperBehavior#application_name
   #
   def render_page_title
-    content_for(:page_title) || @page_title || application_name
+    app   = application_name
+    title = content_for(:page_title) || @page_title
+    if title.blank?
+      app
+    elsif !title.end_with?(app)
+      title << ' - ' << app
+    else
+      title
+    end
   end
 
   # Create <link rel="alternate"> links from a documents dynamically

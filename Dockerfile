@@ -1,4 +1,4 @@
-FROM ruby:2.5.0-alpine
+FROM ruby:2.4.3-alpine
 RUN apk add --no-cache build-base sqlite-dev nodejs bash tzdata
 
 # Create the run user and group

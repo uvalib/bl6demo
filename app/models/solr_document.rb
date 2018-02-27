@@ -50,7 +50,7 @@ class SolrDocument
   use_extension(Blacklight::Document::DublinCore)
 
   field_semantics.merge!(
-    title:       :title_display,
+    title:       :title_display, # TODO: :main_title_display || :title_display
     author:      :author_display,
     language:    :language_facet,
     format:      :format,

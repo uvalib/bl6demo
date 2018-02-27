@@ -11,9 +11,9 @@ require 'blacklight/suggest_search'
 
 SUGGEST_SEARCH_OVERRIDE_MAPPING = {
   title: %i(
+    main_title_display
     title_display
     subtitle_display
-    main_title_display
     alternate_title_display
     series_title_display
     uniform_title_facet

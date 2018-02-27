@@ -18,7 +18,7 @@ class Config::Solr
   # on the relevant fields defined by the search service.
   SOLR_FIELD = {
     display_type_field: :format_facet,  # TODO: Could remove to avoid partial lookups by display type if "_default" is the only appropriate partial.
-    title_field:        :title_display,
+    title_field:        %i(main_title_display title_display),
     subtitle_field:     :subtitle_display,
     alt_title_field:    :linked_title_display,
     author_field:       %i(
@@ -319,8 +319,9 @@ class Config::Solr
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
       # ==== Implementation Notes
-      # [1] IndexPresenterExt#label shows :title_display, :subtitle_display,
-      #     and :linked_title_display so they should not be included here.
+      # [1] IndexPresenterExt#label shows :main_title_display, :title_display,
+      #     :subtitle_display, and :linked_title_display so they should not be
+      #     included here.
 
       config.add_index_field :format_facet, helper_method: :format_facet_label
       config.add_index_field :linked_author_display
@@ -343,8 +344,9 @@ class Config::Solr
       # @see Blacklight::Configuration::Files::ClassMethods#define_field_access
       #
       # ==== Implementation Notes
-      # [1] ShowPresenterExt#heading shows :title_display, :subtitle_display,
-      #     :linked_title_display, :responsibility_statement_display and
+      # [1] ShowPresenterExt#heading shows :main_title_display, :title_display,
+      #     :subtitle_display, :linked_title_display,
+      #     :responsibility_statement_display and
       #     :linked_responsibility_statement_display so they should not be
       #     included here.
       #

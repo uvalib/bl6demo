@@ -7,6 +7,11 @@ __loading_begin(__FILE__)
 
 require 'blacklight/lens'
 
+# Ensure that MARC::XMLReader uses Nokogiri or other XML parser instead of the
+# default (REXML).
+require 'marc'
+MARC::XMLReader.best_available!
+
 # A Blacklight::Document for items acquired from the Solr index service.
 #
 # @see Blacklight::Solr::DocumentExt

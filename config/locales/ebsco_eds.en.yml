@@ -5,7 +5,7 @@ en:
   ebsco_eds:
 
     message:
-      title:    'This title is unavailable for guests, please login to see more information.'
+      title:    'Restricted to UVA users; please login to see this item.'
 
     html_fulltext:
       #title:    h1

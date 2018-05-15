@@ -6,6 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'i18n'
+require 'uva'
 
 module Config
 
@@ -15,8 +16,7 @@ module Config
   #
   module Common
 
-    # String to cause text to continue on the next line within an HTML element.
-    HTML_NEW_LINE = '<br/>'.html_safe.freeze
+    include UVA::Constants
 
     # Options for displaying separator between metadata items with multiple
     # values.

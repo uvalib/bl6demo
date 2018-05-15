@@ -1,4 +1,4 @@
-# lib/ext/ebsco-eds/options_override.rb
+# lib/ext/ebsco-eds/eds_override.rb
 
 __loading_begin(__FILE__)
 

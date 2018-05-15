@@ -236,7 +236,7 @@ module Blacklight
         collection = p[:f][url_field]
 
         # Collection should be an array, because we link to "?f[key][]=value",
-        # however, Facebook (and maybe some other PHP tools) tranform those
+        # however, Facebook (and maybe some other PHP tools) transform those
         # parameters into "?f[key][0]=value", which Rails interprets as a Hash.
         collection = collection.values if collection.is_a?(Hash)
 

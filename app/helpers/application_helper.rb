@@ -12,6 +12,9 @@ require 'config/_common'
 #
 module ApplicationHelper
 
+  include UVA::Constants
+  include UVA::Networks
+
   # Displayed only if a method is set up to avoid returning *nil*.
   NO_LINK_DISPLAY = 'None available'.html_safe.freeze
 

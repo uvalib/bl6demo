@@ -158,8 +158,11 @@ module Blacklight::Eds
       benchmark('EDS fetch', level: :debug) do
         # Results list passes a full search_builder, detailed record only
         # passes params.
-        params = { 'hl' => 'on' }
-        # TODO: make highlighting configurable
+        params = { # TODO: make configurable
+          hl:                       'on',
+          include_image_quick_view: 'on',
+          related_content:          'rs',
+        }
         search =
           case search
             when Blacklight::SearchBuilder    then search.to_hash

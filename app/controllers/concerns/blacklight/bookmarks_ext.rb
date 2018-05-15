@@ -115,7 +115,7 @@ module Blacklight::BookmarksExt
   # == POST /bookmarks[?type=XXX]
   #
   # For adding a single bookmark, suggest use PUT/#update to
-  # /bookmarks/$docuemnt_id instead.
+  # /bookmarks/$document_id instead.
   #
   # But this method, accessed via POST to /bookmarks, can be used for
   # creating multiple bookmarks at once, by posting with keys

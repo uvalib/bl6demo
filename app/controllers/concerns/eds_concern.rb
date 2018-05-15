@@ -7,6 +7,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/eds'
+require 'uva'
 
 # Common concerns of controllers that work with articles (EdsDocument).
 #
@@ -111,17 +112,17 @@ module EdsConcern
       when 101, 102, 103, 104, 105, 113, 130, 131, 132, 133, 134, 135,
         1100, 1103
         # TODO: Determine whether this is correct for all of these error codes
-        logger.debug("[ignore] #{exception.class}: #{exception.message}")
+        UVA::Log.debug(exception, '[ignore]')
         flash[:notice] = 'Please sign on to complete this article search.'
         redirect_to articles_home_path
       when 106
         # EBSCO::EDS::BadRequest
         # "Unknown error encountered"
-        logger.warn("#{exception.class}: #{exception.message}")
+        UVA::Log.warn(exception)
         flash[:notice] = "Article search provider reports: #{message}"
         redirect_to articles_home_path
       when 107
-        logger.error("#{exception.class}: #{exception.message}")
+        UVA::Log.error(exception)
         flash[:notice] =
           'Your IP address has been blocked from making article searches. ' \
           'Please contact a librarian.'
@@ -129,18 +130,18 @@ module EdsConcern
       when 109
         # EBSCO::EDS::BadRequest
         # "Session Token Invalid"
-        logger.debug("[ignore] #{exception.class}: #{exception.message}")
+        UVA::Log.debug(exception, '[ignore]')
       when 114
         # EBSCO::EDS::BadRequest
         # "Retrieval Request AN must contain a valid value."
-        logger.warn("#{exception.class}: #{exception.message}")
+        UVA::Log.warn(exception)
         flash.now[:notice] = message
       when 1102
-        logger.debug("[ignore] #{exception.class}: #{exception.message}")
+        UVA::Log.debug(exception, '[ignore]')
         flash[:notice] = message
         redirect_to articles_home_path
       else
-        logger.error("#{exception.class}: #{exception.message}")
+        UVA::Log.error(exception)
         flash[:notice] = message
         redirect_to articles_home_path
     end

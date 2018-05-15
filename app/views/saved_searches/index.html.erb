@@ -72,8 +72,8 @@
             <%= search_type_label(type) %>
           </td>
           <td class="query">
-            <%= ctrlrs[type].instance_exec(query) do |query| -%>
-              <%- link_params = search_state.reset(query).to_hash -%>
+            <%= ctrlrs[type].instance_exec(query) do |q| -%>
+              <%- link_params = search_state.reset(q).to_hash -%>
               <%- view_context.link_to_previous_search(link_params) -%>
             <%- end -%>
           </td>

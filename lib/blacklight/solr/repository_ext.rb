@@ -218,7 +218,7 @@ module Blacklight::Solr
     protected
 
 =begin # NOTE: using base version
-    # build_connnection
+    # build_connection
     #
     # @return [RSolr::Client]
     #
@@ -269,8 +269,7 @@ module Blacklight::Solr
       solr_params = base_solr_params(cfg, url_params, SB_AUTO_COMPLETE)
       solr_send_and_receive(:get, path, solr_params)
     rescue => e
-      logger.debug { "#{__method__}: #{e.class}: #{e.message}" }
-      nil
+      UVA::Log.debug(__method__, e)
     end
 
     # =========================================================================

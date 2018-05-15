@@ -3,7 +3,7 @@
   # The heading at the top of each lens home page.
   lens    ||= current_lens_key
   heading ||= t("blacklight.#{lens}.welcome", default: :'blacklight.welcome')
-  @page_title = t("blacklight.#{lens}.page_title", default: heading)
+  @page_title ||= t("blacklight.#{lens}.page_title", default: heading)
 
   total_cols = 12
   head_cols  = 7

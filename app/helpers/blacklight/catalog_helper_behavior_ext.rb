@@ -148,7 +148,7 @@ module Blacklight::CatalogHelperBehaviorExt
   # Get the offset counter for a document
   #
   # @param [Integer] idx document index
-  # @param [Integer] offset additional offset to incremenet the counter by
+  # @param [Integer] offset additional offset to increment the counter by
   #
   # @return [Integer]
   #
@@ -320,7 +320,7 @@ module Blacklight::CatalogHelperBehaviorExt
 
 =begin # NOTE: using base version
   # If no search parameters have been given, we should auto-focus the user's
-  # cursor into the searchbox.
+  # cursor into the search box.
   #
   # This method overrides:
   # @see Blacklight::CatalogHelperBehavior#should_autofocus_on_search_box?

@@ -13,7 +13,7 @@ require 'blacklight/document/export'
 # The document class that includes this module should override these methods
 # according to its abilities.
 #
-# (For example, SolrDocument overrides these when [conditinally] including
+# (For example, SolrDocument overrides these when [conditionally] including
 # Blacklight::Solr::Document::Marc.)
 #
 # @see Blacklight::Document::Export

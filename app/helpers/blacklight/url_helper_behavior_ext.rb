@@ -345,7 +345,7 @@ module Blacklight::UrlHelperBehaviorExt
   # expect that format.
   #
   # @param [String] format
-  # @parma [Hash]   params
+  # @param [Hash]   params
   #
   # @return [String]
   #

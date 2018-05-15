@@ -28,7 +28,7 @@ class Config::SolrFake
       alert = name <<
         'This configuration will not work without changing ' \
         'config/blacklight.yml'
-      Rails.logger.error(alert)
+      UVA::Log.error(alert)
       $stderr.puts('ERROR: ' + alert)
     end
     @instance ||= Blacklight::Configuration.new do |config|

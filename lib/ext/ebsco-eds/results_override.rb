@@ -18,8 +18,6 @@ override EBSCO::EDS::Results do
     Publisher
   ).freeze
 
-  FACET_TITLEIZER = EBSCO::EDS::Titleize.new
-
   # ===========================================================================
   # :section: Replacement methods
   # ===========================================================================
@@ -238,7 +236,7 @@ override EBSCO::EDS::Results do
       # if applicable.
       af_values = af_values.map { |entry| [entry['Value'], entry['Count']] }
       if @titleize_facets_on && @titleize_facets.include?(af_id)
-        af_values.map! { |v, c| [FACET_TITLEIZER.titleize(v), c] }
+        af_values.map! { |v, c| [EBSCO::EDS::Titleize.new.titleize(v), c] }
       end
 
       # If this is the facet of interest (e.g. for paginating the facet

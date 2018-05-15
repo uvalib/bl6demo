@@ -1,0 +1,50 @@
+<%# app/views/shared/debug/_session.html.erb -%>
+<%-
+  # Display current URL parameters.
+
+  params_hash  ||= params.to_unsafe_h
+  session_hash ||= session.to_hash
+  user         ||= current_user
+  indent       ||= ' '
+
+  indent = ' ' * indent if indent.is_a?(Numeric)
+  lines = []
+
+  # Formatter "macro".
+  new_line = "\n#{indent}"
+  hash_fmt = ->(s) {
+    s.inspect
+      .gsub(/, +/,      ",#{new_line}")
+      .gsub(/=>/,       ' \0 ')
+      .sub(/\A\s*{\s*/, "{#{new_line}")
+      .sub(/\s*}\s*\Z/, "\n}")
+  }
+
+  # Params display.
+  params_hash = params_hash.presence
+  lines << 'params = ' + hash_fmt.call(params_hash) if params_hash
+
+  # Session display.
+  session_hash =
+    session_hash.map { |k, v|
+      v =
+        case v
+          when Array then truncate(v.inspect, omission: '...]')
+          when Hash  then hash_fmt.call(v)
+          else            v.inspect
+        end
+      %Q(#{k}: #{v})
+    }.join("\n").presence
+  session_hash &&= session_hash.gsub(/^/, indent)
+  lines << "session = {\n#{session_hash}\n}" if session_hash
+
+  # User display.
+  attr = %w(id email guest current_sign_in_at current_sign_in_ip)
+  user = user&.attributes&.slice(*attr)&.presence
+  lines << 'User = ' + hash_fmt.call(user) if user
+
+  # Combined output.
+  lines = lines.join("\n").html_safe
+-%>
+
+<pre class="two-column"><%= lines -%></pre>

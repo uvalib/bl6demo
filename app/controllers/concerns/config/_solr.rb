@@ -5,8 +5,8 @@
 
 __loading_begin(__FILE__)
 
-require_relative '_common'
 require 'blacklight/solr/repository_ext'
+require_relative '_common'
 
 class Config::Solr
 
@@ -67,7 +67,7 @@ class Config::Solr
       alert = name <<
         'This configuration will not work without changing ' \
         'config/blacklight.yml'
-      Rails.logger.error(alert)
+      UVA::Log.error(alert)
       $stderr.puts('ERROR: ' + alert)
     end
     @instance ||= Blacklight::Configuration.new do |config|

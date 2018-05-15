@@ -6,6 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
+require 'uva'
 
 module Config
 
@@ -54,9 +55,7 @@ module Config
       # @return [Symbol]
       #
       def key=(lens_key)
-        Rails.logger.error {
-          "#{__method__}(lens_key.inspect): was: #{@key.inspect}"
-        } if @key
+        UVA::Log.error(__method__, lens_key.inspect, 'was', @key.inspect) if @key
         @key = lens_key
       end
 

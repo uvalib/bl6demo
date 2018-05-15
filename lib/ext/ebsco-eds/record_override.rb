@@ -157,6 +157,8 @@ override EBSCO::EDS::Record do
 =begin # NOTE: using base version
   # Zero or more links to cover images for the item.
   #
+  # @param [String] size_requested
+  #
   # @return [Array<Hash>]
   #
   def images(size_requested = 'all')
@@ -165,6 +167,23 @@ override EBSCO::EDS::Record do
         { size: image['Size'], src: image['Target'] }
       end
     }.compact
+  end
+=end
+
+=begin # NOTE: using base version
+  # Zero or more quick view images.
+  #
+  # @return [Array<Hash>]
+  #
+  def quick_view_images
+    Array.wrap(@record['ImageQuickViewItems']).map { |item|
+      {
+        url:              item['Url'],
+        type:             item['Type'],
+        id:               item['DbId'],
+        accession_number: item['An'],
+      }
+    }
   end
 =end
 
@@ -576,7 +595,8 @@ override EBSCO::EDS::Record do
 =begin # NOTE: using base version
 
   TO_ATTR_HASH_SKIP =
-    %i(@record @items @bib_entity @bib_part @bib_relationships)
+    %i(@record @items @bib_entity @bib_part @bib_relationships
+    @image_quick_view_items)
 
   # to_attr_hash
   #

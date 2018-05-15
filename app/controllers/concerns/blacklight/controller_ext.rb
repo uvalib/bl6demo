@@ -6,6 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
+require 'uva'
 
 # Filters added to this controller apply to all controllers in the
 # hosting application as this module is mixed-in to the application controller
@@ -32,6 +33,7 @@ module Blacklight::ControllerExt
     __included(base, 'Blacklight::ControllerExt')
 
     include LensConcern
+    include UVA::Networks
 
 =begin # NOTE: using base version
     include Blacklight::SearchFields

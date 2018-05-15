@@ -88,6 +88,12 @@ override EBSCO::EDS::RetrievalCriteria do
           @Highlight = (value == 'on') ? 'y' : 'y'
 
         # =====================================================================
+        # Image quick view
+        # =====================================================================
+        when 'include_image_quick_view'
+          @IncludeImageQuickView = value ? 'y' : 'n'
+
+        # =====================================================================
         # Anything else
         # =====================================================================
 
@@ -104,9 +110,10 @@ override EBSCO::EDS::RetrievalCriteria do
     @PageNumber ||= (@Offset / @ResultsPerPage) + 1 if @Offset
 
     # Apply defaults where values where not explicitly given.
-    @View           ||= info.default_result_list_view
-    @ResultsPerPage ||= info.default_results_per_page
-    @PageNumber     ||= 1
+    @IncludeImageQuickView ||= info.default_include_image_quick_view
+    @View                  ||= info.default_result_list_view
+    @ResultsPerPage        ||= info.default_results_per_page
+    @PageNumber            ||= 1
 
   end
 

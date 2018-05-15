@@ -6,6 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
+require 'uva'
 
 # Rolls-up logic associated with bibliographic citation exports and also
 # "librarian view".
@@ -220,7 +221,7 @@ module ExportConcern
     render
   rescue => e # ActionView::MissingTemplate => e
     unless e.is_a?(ActionView::MissingTemplate)
-      logger.error("#{__method__}: UNEXPECTED #{e.class}: #{e.message}")
+      UVA::Log.error(__method__, e, 'UNEXPECTED')
     end
     docs    = @response&.documents || []
     exports = docs.map { |x| x.export_as(fmt_name) if x.exports_as?(fmt_name) }

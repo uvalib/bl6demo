@@ -4,6 +4,17 @@
 // Common definitions.
 //=============================================================================
 
+%dd-item-format {
+    .label {
+        display:        inline-block;
+        vertical-align: text-top;
+    }
+}
+
+//=============================================================================
+// Common settings.
+//=============================================================================
+
 // Prevent pages with little content (like empty bookmarks or saved searches)
 // from allowing the footer to hike up to the middle of the screen on a desktop
 // display.
@@ -22,6 +33,10 @@
 .facets-heading {
     margin-top:    22px;
     margin-bottom: 7px;
+}
+
+.facet_select {
+    @include hyphens(none);
 }
 
 .top-panel-heading {

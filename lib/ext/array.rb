@@ -54,7 +54,7 @@ class Array
   # Recursive merge into self.
   #
   # If *other* is an Array, then duplicates of its elements are appended to
-  # *self* unless they are aleady present.  If *other* is any other non-nil
+  # *self* unless they are already present.  If *other* is any other non-nil
   # value then a duplicate of *other* is appended to *self* unless it is
   # already present.
   #

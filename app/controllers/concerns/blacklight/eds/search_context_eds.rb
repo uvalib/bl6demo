@@ -214,6 +214,7 @@ module Blacklight::Eds::SearchContextEds
   end
 =end
 
+=begin # NOTE: using base version
   # Used in the show action for single view pagination to set up
   # @previous_document and @next_document.
   #
@@ -222,27 +223,23 @@ module Blacklight::Eds::SearchContextEds
   # This method overrides:
   # @see Blacklight::SearchContextExt#setup_next_and_previous_documents
   #
-  def setup_next_and_previous_documents # TODO: Separated for testing -- can probably be removed in favor of the base version.
+  def setup_next_and_previous_documents
     counter = search_session['counter']
     search  = current_search_session
-    $stderr.puts(">>> #{__method__}: counter #{counter}")                                            # TODO: debugging - remove
-    $stderr.puts(">>> #{__method__}: search  #{search.inspect}")                                     # TODO: debugging - remove
     return unless counter && search
     index          = counter.to_i - 1
     query          = search.query_params.with_indifferent_access
-    $stderr.puts(">>> #{__method__}: index   #{index}")                                              # TODO: debugging - remove
-    $stderr.puts(">>> #{__method__}: query   #{query.inspect}")                                      # TODO: debugging - remove
     response, docs = get_previous_and_next_documents_for_search(index, query)
     search_session['total']  = response.total
     @search_context_response = response
     @previous_document       = docs.first
     @next_document           = docs.last
-    $stderr.puts(">>> #{__method__}: response.total = #{response.total}, docs.size = #{docs.size}")  # TODO: debugging - remove
-    $stderr.puts(">>> #{__method__}: previous_document #{@previous_document&.id || '-'}")            # TODO: debugging - remove
-    $stderr.puts(">>> #{__method__}: next_document     #{@next_document&.id || '-'}")                # TODO: debugging - remove
   rescue Blacklight::Exceptions::InvalidRequest => e
-    logger.warn "#{__method__}: #{e}"
+    UVA::Log.warn(__method__, e)
+  rescue => e
+    UVA::Log.error(__method__, e, 'UNEXPECTED')
   end
+=end
 
 end
 

@@ -6,10 +6,6 @@
 <h2 class="modal-title">Bibliographic Citations</h2>
 <%- docs.each do |doc| -%>
 
-  <%- mla     = doc.export_as_mla_citation_txt -%>
-  <%- apa     = doc.export_as_apa_citation_txt -%>
-  <%- chicago = doc.export_as_chicago_citation_txt -%>
-
   <h3 class="modal-title"><%= document_title(doc) %></h3>
 
   <h4><%= t('blacklight.citation.mla') %></h4>

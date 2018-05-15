@@ -62,44 +62,14 @@
 
   # Hidden embedded values for page debugging.
   server_info = {
-    'server-host'   => 'host_server',
+    'server-host'   => host_server,
     'server-path'   => request.path,
     'server-query'  => '?' << CGI.unescape(request.query_string),
     'server-layout' => File.basename(layout),
-  }.map { |id, value| content_tag(:div, value, id: id) }.join(' ').html_safe
-
-  # More elaborate debugging - # TODO: remove or make conditional
-  debugging =
-    if Rails.env.development?
-      indent = ' '
-      new_line = "\n#{indent}"
-      hash_end = "\n}"
-      hash_fmt = ->(s) {
-        s.inspect
-          .gsub(/, +/,      ",#{new_line}")
-          .gsub(/=>/,       ' \0 ')
-          .sub(/\A\s*{\s*/, "{#{new_line}")
-          .sub(/\s*}\s*\Z/, hash_end)
-      }
-      p = +'params = ' << hash_fmt.call(params.to_unsafe_h)
-      s = +"session = {\n"
-      s <<
-        session.to_hash.map { |k, v|
-          +"#{k}: " <<
-            case v
-              when Array then truncate(v.inspect, omission: '...]')
-              when Hash  then hash_fmt.call(v)
-              else            v.inspect
-            end
-        }.join("\n").gsub(/^/, indent)
-      s << hash_end
-      c = current_user
-      c &&=
-        c.attributes
-          .slice('id', 'email', 'guest', 'current_sign_in_at', 'current_sign_in_ip')
-      c = +'User = ' << hash_fmt.call(c)
-      [p, s, c].join("\n").html_safe
-    end
+  }.map { |id, value|
+    content_tag(:div, value, id: id)
+  }.join(' ').html_safe
+  debugging = session[:debug_session] || Rails.env.development?
 -%>
 
 <footer id="footer-navbar" class="navbar navbar-inverse navbar-static-top" role="navigation">
@@ -138,6 +108,4 @@
 
 </footer>
 
-<%- if debugging -%>
-  <pre class="two-column"><%= debugging -%></pre>
-<%- end -%>
+<%= render 'shared/debug/session' if debugging -%>

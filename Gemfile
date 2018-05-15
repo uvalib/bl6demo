@@ -1,7 +1,10 @@
 # Gemfile
 
+ruby '~> 2.5.1'
+
 source 'https://rubygems.org'
 
+# For gems from GitHub, use `gem 'repo', github: 'owner/repo'`.
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
@@ -12,7 +15,7 @@ end
 # =============================================================================
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.4'
+gem 'rails', '~> 5.2'
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use Puma as the app server
@@ -50,7 +53,7 @@ gem 'tzinfo-data', platforms: %i(mingw mswin x64_mingw jruby)
 # @see https://github.com/ebsco/edsapi-ruby/wiki/Quick-Start
 # =============================================================================
 
-gem 'blacklight', '>= 6.14'
+gem 'blacklight', '~> 6.15'
 gem 'rsolr', '>= 1.0'
 gem 'jquery-rails'
 gem 'devise', '~> 4.4.1'
@@ -80,6 +83,10 @@ group :development, :test do
 end
 
 group :development do
+
+  # Support RubyMine built-in debugger.
+  gem 'ruby-debug-ide'
+  gem 'debase'
 
   # Use Capistrano for deployment.
   # gem 'capistrano-rails'

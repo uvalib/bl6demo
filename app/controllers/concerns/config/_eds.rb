@@ -260,6 +260,7 @@ module Config::Eds
       config.add_show_field :eds_cover_thumb_url,      helper_method: :url_link
       config.add_show_field :eds_cover_medium_url,     helper_method: :url_link
       config.add_show_field :eds_images
+      config.add_show_field :eds_quick_view_images
       config.add_show_field :eds_pdf_fulltext_available
       config.add_show_field :eds_ebook_pdf_fulltext_available
       config.add_show_field :eds_ebook_epub_fulltext_available

@@ -476,7 +476,7 @@ module Blacklight
     def solr_param_quote(value, options = nil)
       value = value.to_s.squish
       quote = options&.fetch(:quote, nil) || %q(")
-      if value =~ /^[a-z0-9$_\-\^]+$/i
+      if value =~ /^[a-z0-9$_^\-]+$/i
         value
       else
         # Strip outer balanced quotes.

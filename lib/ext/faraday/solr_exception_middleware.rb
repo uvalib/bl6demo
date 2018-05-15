@@ -99,7 +99,7 @@ module Faraday
 
     rescue Faraday::Error => e # NOTE: 0% coverage for this case
       $stderr.puts "!!!!!!!!!! Faraday::Error caught #{e}"
-      raise RSolr::Error::Http.new(env, e.response)
+      raise RSolr::Error::Http.new(e.response)
 
     rescue Exception => e # NOTE: 0% coverage for this case
       $stderr.puts "!!!!!!!!!! Faraday caught #{e}"

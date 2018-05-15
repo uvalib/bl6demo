@@ -57,14 +57,17 @@ module Blacklight::BlacklightHelperBehaviorExt
   # @see Blacklight::BlacklightHelperBehavior#application_name
   #
   def render_page_title
-    app   = application_name
-    title = content_for(:page_title) || @page_title
-    if title.blank?
-      app
-    elsif !title.end_with?(app)
-      title << ' - ' << app
+    page_name = (content_for(:page_title) || @page_title).to_s
+    site_name = application_name.to_s
+    separator = ' - '
+    if page_name.blank?
+      site_name
+    elsif page_name.end_with?(site_name)
+      page_name
+    elsif page_name.end_with?(separator)
+      page_name + site_name
     else
-      title
+      page_name + separator + site_name
     end
   end
 

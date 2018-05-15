@@ -6,6 +6,7 @@
 __loading_begin(__FILE__)
 
 require 'blacklight/lens'
+require 'uva'
 
 module RescueConcern
 
@@ -138,15 +139,15 @@ module RescueConcern
   #
   def handle_generic_error(exception, flash_notice, redirect_path)
     if flash[:notice] == flash_notice
-      logger.error { "#{__method__} is looping" }
+      UVA::Log.error(__method__, 'is looping')
       raise exception
     elsif request.xhr?
       # TODO: not clear if this is actually the desired behavior in this case
-      logger.error(exception)
+      UVA::Log.error(exception)
       flash[:notice] = nil
       flash.now[:notice] = flash_notice
     else
-      logger.error(exception)
+      UVA::Log.error(exception)
       redirect_to redirect_path, notice: flash_notice
     end
   end

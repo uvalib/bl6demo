@@ -33,13 +33,22 @@ module ArticlesHelper
   EDS_PLINK_LABEL =
     'Online via <b>EBSCO Discovery Service</b>'.html_safe.freeze
 
+  # URL anchor location on the page for the full text viewer.
   FULL_TEXT_ANCHOR = 'full-text'
 
+  # URL sign-on path.
+  SIGN_ON_PATH = '/account/login'
+
+  # Displayed only if a method is set up to avoid returning *nil*.
+  EBSCO_NO_LINK = 'None available'.html_safe.freeze
+
+  # Indicate whether a method should return *nil* if there was no data.
+  # If *false* then self#EBSCO_NO_LINK is returned.
   RETURN_NIL = {
+    best_fulltext:              false,
+    eds_links:                  false,
     eds_publication_type_label: true,
-    eds_links:      false,
-    best_fulltext:  false,
-  }
+  }.freeze
 
   EBSCO_LINK_TARGETS = %w(pdf ebook-pdf ebook-epub html cataloglink).freeze
 
@@ -71,9 +80,6 @@ module ArticlesHelper
 
   # For matching any of the XML element tag strings.
   EBSCO_XML_KEYS = Regexp.new(EBSCO_XML_TO_HTML.keys.join('|'))
-
-  # Displayed only if a method is set up to avoid returning *nil*.
-  EBSCO_NO_LINK = 'None available'.html_safe.freeze
 
   # ===========================================================================
   # :section:
@@ -139,7 +145,7 @@ module ArticlesHelper
       if array_of_hashes.present? # NOTE: 0% coverage for this case -- need to investigate
         controller = 'articles' # TODO: generalize
         separator  = opt.delete(:separator)
-        guest = current_or_guest_user.guest
+        guest = eds_guest?
         id    = values['id'].to_s.tr('.', '_')
         BEST_FULLTEXT_TYPES.map { |type|
           hash = array_of_hashes.find { |hash| hash['type'] == type }
@@ -152,14 +158,7 @@ module ArticlesHelper
           # Replace 'URL' label for catalog links.
           label = (type == 'cataloglink') ? 'Catalog Link' : hash['label']
           label = 'Full Text' if label.blank?
-          if guest
-            # Sign in and redirect if guest; return with full-text link if not.
-            url    = "/users/sign_in?redirect=#{u(url)}"
-            label += ', login to view'
-            link_to(label, url)
-          else
-            outlink(label, url)
-          end
+          authorized_link(guest, label, url)
         }.compact.join(separator).html_safe.presence
       end
     result || (EBSCO_NO_LINK unless RETURN_NIL[__method__])
@@ -180,7 +179,7 @@ module ArticlesHelper
     anchor + scroller
   end
 
-  # html_fulltext
+  # fulltext_link
   #
   # @param [Hash] options
   #
@@ -337,27 +336,66 @@ module ArticlesHelper
   # @return [nil]                           If no URL was provided.
   #
   def make_eds_link(*args)
+
+    # Take values from options if present.
     opt   = args.extract_options!.except('type', 'expires')
     label = opt.delete('label').presence
     url   = opt.delete('url').presence
     icon  = opt.delete('icon').presence
     guest = opt.delete('guest')
     guest = opt.delete(:guest) || guest
-    guest = current_or_guest_user.guest if guest.nil?
     opt.delete('type')
     opt.delete('expires')
+
+    # Values from the argument list are given preference.
     label = args.shift || label
     url   = args.shift || url
     icon  = args.shift || icon
-    if guest || (url == 'detail')
-      label = 'Access is available, login to view'
-      url   = '/users/sign_in'
+
+    # Show the link, routing through the sign-on if necessary.
+    return unless url.present?
+    label = image_tag(icon) if icon.to_s.match(/^http/)
+    label ||= EDS_LINK_LABEL
+    url = '#' + FULL_TEXT_ANCHOR if url == 'detail'
+    authorized_link(guest, label, url, opt)
+
+  end
+
+  # authorized_link
+  #
+  # @param [String, Boolean] guest
+  # @param [String]          label
+  # @param [String]          url
+  # @param [Hash, nil]       opt
+  #
+  # @return [String, nil]
+  #
+  def authorized_link(guest, label, url, opt = nil)
+    return unless url.present?
+    case guest
+      when nil    then guest = eds_guest?
+      when String then guest = %w(true yes on).include?(guest)
+    end
+    label ||= 'Link'
+    anchor = url.start_with?('#')
+    opt ||= {}
+    if guest
+      label += ' (sign on to view)' # TODO: I18n
+      url = request.path + url if anchor
+      url = "?redirect=#{u(url)}"
+      url = "#{SIGN_ON_PATH}#{url}"
       link_to(label, url, opt)
-    elsif url.present?
-      label = image_tag(icon) if icon.to_s.match(/^http/)
-      label ||= EDS_LINK_LABEL || 'Link'
+    elsif anchor
+      link_to(label, url, opt)
+    else
       outlink(label, url, opt)
     end
+  end
+
+  # Should the current be user as treated unauthorized?
+  #
+  def eds_guest?
+    current_or_guest_user.guest
   end
 
 end

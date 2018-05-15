@@ -1,4 +1,4 @@
-# app/helpers/blacklight/render_constaints_helper_behavior_ext.rb
+# app/helpers/blacklight/render_constraints_helper_behavior_ext.rb
 #
 # frozen_string_literal: true
 # warn_indent:           true

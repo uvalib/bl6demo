@@ -142,18 +142,25 @@ module SessionConcern
   def cleanup_parameters
 
     changed = false
+    original_size = params.to_unsafe_h.size
 
     # Eliminate "noise" parameters (usually generated from the advanced search
     # form), including 'op="AND"' since this is always the default logical
     # operation.
-    original_size = params.to_unsafe_h.size
     params.delete_if { |k, v| k.blank? || v.blank? }
     %w(utf8).each { |k| params.delete(k) }
     params.delete(:op) if params[:op] == 'AND'
     reset_search = (params.delete(:commit) == 'Search')
-    changed ||= (params.to_unsafe_h.size != original_size)
+    debug_session = params.delete(:debug_session)
+
+    # Update session if indicated.
+    case debug_session.to_s.downcase
+      when 'true'  then session[:debug_session] = true
+      when 'false' then session.delete(:debug_session)
+    end
 
     # If parameters were removed, redirect to the corrected URL.
+    changed ||= (params.to_unsafe_h.size != original_size)
     will_redirect if changed
 
   end

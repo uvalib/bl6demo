@@ -153,9 +153,9 @@ module ExportHelper
 
   # refworks_document_path
   #
-  # @param [Hash] options
+  # @param [Hash] args
   #
-  # @options url_params [String] :id        Required: Document ID.
+  # @options args [String] :id        Required: Document ID.
   #
   # @return [String, nil]
   #
@@ -170,9 +170,9 @@ module ExportHelper
 
   # For exporting a single document in EndNote format.
   #
-  # @param [Hash] options
+  # @param [Hash] args
   #
-  # @options url_params [String] :id        Required: Document ID.
+  # @options args [String] :id        Required: Document ID.
   #
   # @return [String, nil]
   #
@@ -187,9 +187,9 @@ module ExportHelper
 
   # For exporting a single document in Zotero RIS format.
   #
-  # @param [Hash] options
+  # @param [Hash] args
   #
-  # @options url_params [String] :id        Required: Document ID.
+  # @options args [String] :id        Required: Document ID.
   #
   # @return [String, nil]
   #
